@@ -1,8 +1,8 @@
 # Example installation on Ubuntu 22.04.03 LTS with Apache2, APCu, redis and mariadb behind a NGINX proxy
 
 ## Who is this for?
-This is an example installtion for Ubuntu users that wan't to host a Nextcloud instance behind a NGINX proxy and have no security or performance warnings.
-There are some placeholder values or variables that always start with x. You need to repace them your own data. 
+This is an example installation for Ubuntu users who want to host a Nextcloud instance behind a NGINX proxy and have no security or performance warnings.
+There are some placeholder values or variables that always start with x. You need to replace them your data. 
 This is the structure of this guide.
 
 ![Unbenanntes Diagramm](https://github.com/jameskimmel/PrivateInstallScripts/assets/17176225/9ca231a4-8fd7-4615-8445-e37ff6dccd14)
@@ -16,12 +16,12 @@ We install all the software that is needed plus some optional software so we won
 sudo apt install apache2 mariadb-server exif imagemagick redis-server bzip2
 ```
 
-Now we install all php modules.
+Install all php modules.
 ```bash
 sudo apt install libapache2-mod-php php-gd php-mysql php-curl php-mbstring php-intl php-gmp php-bcmath php-xml php-imagick php-zip php-bz2 php-intl php-imagick php-redis php-apcu
 ```
 ## MariaDB
-We change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
+Change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
 ```bash
 sudo nano /etc/mysql/conf.d/nextcloud.cnf
 ```
@@ -44,13 +44,13 @@ sudo mysql
 ```
 You should now see "MariaDB [(none)]>"
 
-First we check if the tx_isolation is "READ-COMITTED" and if binlog_format is "ROW".
+Check if the tx_isolation is "READ-COMITTED" and if binlog_format is "ROW".
 ```mysql
 SELECT @@global.tx_isolation;
 SELECT @@global.binlog_format;
 ```
 If everything looks good, we can continue. 
-Insert this to create a database called nextcloud. Repalce all three x_ variables with your data.
+Insert this to create a database called nextcloud. Replace all three x_ variables with your data.
 ```mysql
 CREATE USER 'x_database_user'@'localhost' IDENTIFIED BY 'x_database_password';
 CREATE DATABASE IF NOT EXISTS nextcloud CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
@@ -58,9 +58,9 @@ GRANT ALL PRIVILEGES ON nextcloud.* TO 'x_database_user'@'localhost';
 FLUSH PRIVILEGES;
 exit;
 ```
-You shoud see 3 times a "Query OK" line and a "Bye" at the end.
+You should see 3 times a "Query OK" line and a "Bye" at the end.
 
-## Download Nextcloud, verify, extract and move
+## Nextcloud
 Download Nextcloud, verify, extract and move to the webroot.
 ```bash
 wget https://download.nextcloud.com/server/releases/latest.tar.bz2
@@ -156,7 +156,7 @@ sudo systemctl reload apache2.service
 
 
 ## NGINX settings on the reverse Proxy
-Create an emtpy host without a cert.
+Create an emtpy site without ssl.
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
 ```
@@ -173,7 +173,7 @@ sudo nginx -t
 sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.conf /etc/nginx/sites-enabled/cloud.x_yourdomain.conf
 sudo nginx -s reload
 ```
-Now we let certbot create a cert. For certbot to be sucessfull, you need an A or AAAA record that point to your proxy with the open port 80.
+Now we let certbot create a cert. For certbot to be sucessfull, you need an A or AAAA record that points to your proxy with the open port 80.
 ```bash
 sudo certbot
 ```
@@ -183,7 +183,7 @@ This will create a cert and also change your config to rediret all traffic to ht
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
 ```
-edit NGINX to look like this. At the time of writing, cerbot will not automatically create http2 in the two listening . This is needed so NGINX does not throw warnings. 
+edit NGINX to look like this. At the time of writing, certbot will not automatically create http2 in the two listenings. This is needed so NGINX does not throw warnings. 
 ```NGINX
 server {
     server_name cloud.x_youromain.com;
@@ -263,11 +263,11 @@ sudo -u www-data php occ  maintenance:install \
 --data-dir='/var/www/nextcloud/data'
 ```
 
-If we navigate now to https://cloud.x_youromain.com, we should see a warning that we are not trusted, because we have not setup the proxy configs yet.
+If we navigate now to https://cloud.x_youromain.com, we should see a warning that we are not trusted, because we have not set up the proxy configs yet.
 
 
 ## PHP config settings
-We do some changes to your config.php file. 
+Edit config.php file. 
 ```bash
 sudo nano /var/www/nextcloud/config/config.php
 ```
@@ -309,9 +309,8 @@ Change the settings by
 sudo -u www-data php /var/www/nextcloud/occ background:cron
 ```
 ## Mail
-
-In the webGUI, go to user settings and insert mail adress for your x_nextcloud_admin_user you created earlier. 
-Naviate to Administration -> Basic settings to setup outgoing mail. In my example, I am using Office365 with an AppPassword created in the account settings of MS365.
+In the web GUI, go to user settings and insert the mail address for the x_nextcloud_admin_user you created earlier. 
+Naviate to Administration -> Basic settings to set up outgoing mail. In my example, I am using Office365 with an AppPassword created in the account settings of MS365.
 ```config
 Servername: smtp.office365.com
 Port: 587
@@ -340,7 +339,7 @@ sudo nano /var/www/nextcloud/config/config.php
 ```bash
 sudo nano /etc/php/x_yourphpversion/apache2/conf.d/20-apcu.ini
 ```
-chang it to: 
+Change it to: 
 ```config
 extension=apcu.so
 apc.enabled=1
@@ -352,7 +351,7 @@ sudo -u www-data php8.1 --define apc.enable_cli=1  /var/www/nextcloud/occ  maint
 
 
 # NFS mount
-To use a NFS mount instead of the /var/www/data directory, we should do these steps at the beginning.
+To use an NFS mount instead of the /var/www/data directory, we should do these steps at the beginning.
 Todo: Setup systemd, so Nextcloud only starts after the mount is done. 
 ```bash
 sudo apt install nfs-common
