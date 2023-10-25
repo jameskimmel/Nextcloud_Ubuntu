@@ -1,7 +1,7 @@
-# Example installation on Ubuntu 22.04.03 LTS with Apache2, APCu, redis and mariadb behind a NGINX proxy, no Docker no Snap
+# Example installation on Ubuntu 22.04.03 LTS with Apache2, APCu, redis and mariadb behind a NGINX proxy, no Docker, no Snap
 
 ## Who is this for?
-This is an example installation for Ubuntu users who want to host a Nextcloud instance behind a NGINX proxy. No Docker nor Snap. 
+This is an example installation for Ubuntu users who want to host a Nextcloud instance behind a NGINX proxy. No Docker, no Snap. 
 The admin center should show no warnings and the instance should get a perfect security score from scan.nextcloud.com.
 There are some placeholder values or variables that always start with x_. You need to replace them with your data. 
 This is the structure of the setup used in this guide.
