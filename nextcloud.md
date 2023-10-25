@@ -352,6 +352,8 @@ sudo -u www-data php8.1 --define apc.enable_cli=1  /var/www/nextcloud/occ  maint
 
 
 # NFS mount
+This is not finished. Systemd should only start nextcloud after the mount is successful.  
+
 To use an NFS mount instead of the /var/www/data directory, we should do these steps at the beginning.
 Todo: Setup systemd, so Nextcloud only starts after the mount is done. 
 ```bash
