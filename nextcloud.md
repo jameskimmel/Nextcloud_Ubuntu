@@ -3,7 +3,7 @@
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance behind a NGINX proxy. No Docker nor Snap. 
 The admin center should show no warnings and the instance should get a perfect security score from scan.nextcloud.com.
-There are some placeholder values or variables that always start with x_. You need to replace them your data. 
+There are some placeholder values or variables that always start with x_. You need to replace them with your data. 
 This is the structure of the setup used in this guide.
 
 ![setup](https://github.com/jameskimmel/Nextcloud_Ubuntu/assets/17176225/a5aae0e5-6560-4c4f-9a6d-cf062b1fdb8b)
