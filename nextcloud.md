@@ -20,7 +20,7 @@ sudo apt install apache2 mariadb-server exif imagemagick redis-server bzip2
 
 Install all php modules.
 ```bash
-sudo apt install libapache2-mod-php php-gd php-mysql php-curl php-mbstring php-intl php-gmp php-bcmath php-xml php-imagick php-zip php-bz2 php-intl php-imagick php-redis php-apcu
+sudo apt install libapache2-mod-php php-gd php-posix php-mysql php-ctype php-curl php-mbstring php-gmp php-dom php-bcmath php-xml php-imagick php-zip php-bz2 php-intl php-imagick php-redis php-apcu
 ```
 ## MariaDB
 Change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
