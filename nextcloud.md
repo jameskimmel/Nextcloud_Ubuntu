@@ -331,11 +331,12 @@ Add redis to the www-data group
 ```bash
 usermod -a -G redis www-data
 ```
-Change nextcloud PHP config. While we are in this file, we also add the memcache.local for APCu.
+Change nextcloud PHP config. 
 ```bash
 sudo nano /var/www/nextcloud/config/config.php
 ```
-change to
+While we are in this file, we also add the memcache.local for APCu.
+Change to:
 ```PHP
   'memcache.local' => '\OC\Memcache\APCu',
   'memcache.locking' => '\OC\Memcache\Redis',
@@ -346,19 +347,24 @@ change to
      'password' => '',  
       ),
 ```
+Configure Redis server
 ```bash
 sudo nano /etc/redis/redis.conf
 ```
 Set unixsocket to /var/run/redis/redis.sock
 Set port to 0
 Set unixsocketperm to 770
-Exit and save
-
+Exit and save.
+Restart redis
+```bash
 sudo service redis-server restart
-Check output
+```
+Check output of redis
+```bash
 ls -lh /var/run/redis
-
-
+```
+### APCu
+Change apcu.ini
 ```bash
 sudo nano /etc/php/x_yourphpversion/apache2/conf.d/20-apcu.ini
 ```
@@ -368,6 +374,7 @@ extension=apcu.so
 apc.enabled=1
 apc.enable_cli=1
 ```
+To start APCu automatically use this command and replace the PHP version 8.1 if needed
 ```bash
 sudo -u www-data php8.1 --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
 ```
