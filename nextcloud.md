@@ -25,7 +25,7 @@ sudo apt install libapache2-mod-php php-gd php-posix php-mysql php-ctype php-cur
 ## MariaDB
 Use the integrated guide to secure Mariadb
 ```bash
-mysql_secure_installation
+mariadb-secure-installation
 ```
 Change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
 ```bash
@@ -94,6 +94,11 @@ We search for these settings to change (use ctrl+W to search in nano).
 memory_limit = 1G
 upload_max_filesize = 50G
 post_max_size = 0
+max_execution_time = 3600
+date.timezone = Europe/Amsterdam
+
+To-do: check if opcache settings are needed here
+check for other settings that could benefit
 ```
 Save and exit. Reload apache2
   
