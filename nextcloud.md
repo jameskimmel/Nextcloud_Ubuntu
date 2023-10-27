@@ -1,7 +1,7 @@
 # Example installation on Ubuntu 22.04.03 LTS with Apache2, APCu, redis and mariadb behind a NGINX proxy, no Docker, no Snap
 
 ## Who is this for?
-This is an example installation for Ubuntu users who want to host a Nextcloud instance behind a NGINX proxy. No Docker, no Snap. 
+This is currently still a draft! Please don't use this in production! This is an example installation for Ubuntu users who want to host a Nextcloud instance behind a NGINX proxy. No Docker, no Snap. 
 The admin center should show no warnings and the instance should get a perfect security score from scan.nextcloud.com.
 There are some placeholder values or variables that always start with x_. You need to replace them with your data. 
 This is the structure of the setup used in this guide.
@@ -23,6 +23,10 @@ Install all php modules.
 sudo apt install libapache2-mod-php php-gd php-posix php-mysql php-ctype php-curl php-mbstring php-gmp php-dom php-bcmath php-xml php-imagick php-zip php-bz2 php-intl php-imagick php-redis php-apcu
 ```
 ## MariaDB
+Use the integrated guide to secure Mariadb
+```bash
+mysql_secure_installation
+```
 Change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
 ```bash
 sudo nano /etc/mysql/conf.d/nextcloud.cnf
@@ -148,11 +152,7 @@ insert:
 Enable site and mods:
 ```bash
 sudo a2ensite nextcloud.conf
-sudo a2enmod rewrite
-sudo a2enmod headers
-sudo a2enmod env
-sudo a2enmod dir
-sudo a2enmod mime
+sudo a2enmod rewrite headers env dir mime
 sudo systemctl reload apache2.service
 ```
 
@@ -321,23 +321,44 @@ Needs authentification, sender and user is me@mydomain.com
 AppPasswort
 ```
 
-## caching
-We are going to use APCu and Redis for caching. 
-
+## Caching
+Check if Opcache is working
+```bash
+php -r 'phpinfo();' | grep opcache.enable
+```
+### Redis
+Add redis to the www-data group
+```bash
+usermod -a -G redis www-data
+```
+Change nextcloud PHP config. While we are in this file, we also add the memcache.local for APCu.
 ```bash
 sudo nano /var/www/nextcloud/config/config.php
 ```
+change to
 ```PHP
   'memcache.local' => '\OC\Memcache\APCu',
   'memcache.locking' => '\OC\Memcache\Redis',
   'redis' => array(
      'host' => 'localhost',
      'port' => 6379,
-     'timeout' => 0.0,
-     'password' => '', 
+     'timeout' => 1,
+     'password' => '',  
       ),
-
 ```
+```bash
+sudo nano /etc/redis/redis.conf
+```
+Set unixsocket to /var/run/redis/redis.sock
+Set port to 0
+Set unixsocketperm to 770
+Exit and save
+
+sudo service redis-server restart
+Check output
+ls -lh /var/run/redis
+
+
 ```bash
 sudo nano /etc/php/x_yourphpversion/apache2/conf.d/20-apcu.ini
 ```
@@ -363,7 +384,7 @@ sudo  nano /etc/fstab
 ```
 add
 ```config
-x_IPv4_mountpoint:/mnt/pool/Nextcloud /media/nextcloud  nfs defaults 0 0
+x_IPv4_mountpoint:/mnt/pool/Nextcloud /mnt/nextcloud  nfs defaults 0 0
 ```
 
 
