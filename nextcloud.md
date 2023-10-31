@@ -85,6 +85,9 @@ gpg --import nextcloud.asc
 verify
 ```bash
 md5sum -c latest.tar.bz2.md5 < latest.tar.bz2
+```
+and
+```bash
 gpg --verify latest.tar.bz2.asc latest.tar.bz2
 ```
 extract and move to the webroot
