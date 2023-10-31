@@ -96,9 +96,6 @@ upload_max_filesize = 50G
 post_max_size = 0
 max_execution_time = 3600
 date.timezone = Europe/Amsterdam
-
-To-do: check if opcache settings are needed here
-check for other settings that could benefit
 ```
 Save and exit. Reload apache2
   
