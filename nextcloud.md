@@ -8,7 +8,12 @@ This is the structure of the setup used in this guide.
 
 ![setup](https://github.com/jameskimmel/Nextcloud_Ubuntu/assets/17176225/a5aae0e5-6560-4c4f-9a6d-cf062b1fdb8b)
 
-
+## Getting ready
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install unattended-upgrades
+sudo dpkg-reconfigure unattended-upgrades
+```
 
 ## Install packages
 Nextcloud currently recommends PHP 8.2 but Ubuntu 22.04 comes with PHP8.1. I think it is easier to use a slightly outdated PHP version, than to add Ondrejs PHP repositories. 
