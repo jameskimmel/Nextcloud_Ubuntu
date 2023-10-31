@@ -100,9 +100,9 @@ rm  latest.tar.bz2 latest.tar.bz2.asc  latest.tar.bz2.md5  nextcloud.asc
 ```
 ## PHP settings
 
-We wanna change the PHP memory limit and upload filesize. Replace x_php_version with the current PHP version. 
+We wanna change the PHP memory limit and upload filesize. Replace 8.1 if you have a newer version of PHP.
 ```bash
-sudo nano /etc/php/x_php_version/apache2/php.ini
+sudo nano /etc/php/8.1/apache2/php.ini
 ```
 
 We search for these settings to change (use ctrl+W to search in nano).
