@@ -157,7 +157,7 @@ Enable site and mods:
 ```bash
 sudo a2ensite nextcloud.conf
 sudo a2enmod rewrite headers env dir mime
-sudo systemctl reload apache2.service
+sudo systemctl reload apache2
 ```
 
 
