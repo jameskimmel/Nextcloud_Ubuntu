@@ -48,7 +48,7 @@ sudo systemctl restart mariadb.service
 
 Create the database
 ```bash
-sudo mysql
+sudo mariadb
 ```
 You should now see "MariaDB [(none)]>"
 
