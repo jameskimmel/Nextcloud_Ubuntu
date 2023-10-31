@@ -24,7 +24,8 @@ sudo apt install libapache2-mod-php php-gd php-posix php-mysql php-ctype php-cur
 ```
 ## MariaDB
 Secure MariaDB
-```bashmariadb-secure-installation
+```bash
+mariadb-secure-installation
 ```
 Change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
 ```bash
