@@ -74,14 +74,17 @@ sudo mariadb-secure-installation
 ```
 
 ## Nextcloud
-Download Nextcloud and verify
+Download Nextcloud
 ```bash
 wget https://download.nextcloud.com/server/releases/latest.tar.bz2
 wget https://download.nextcloud.com/server/releases/latest.tar.bz2.asc
 wget https://download.nextcloud.com/server/releases/latest.tar.bz2.md5
 wget https://nextcloud.com/nextcloud.asc
-md5sum -c latest.tar.bz2.md5 < latest.tar.bz2
 gpg --import nextcloud.asc
+```
+verify
+```bash
+md5sum -c latest.tar.bz2.md5 < latest.tar.bz2
 gpg --verify latest.tar.bz2.asc latest.tar.bz2
 ```
 extract and move to the webroot
