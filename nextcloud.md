@@ -90,7 +90,7 @@ and
 ```bash
 gpg --verify latest.tar.bz2.asc latest.tar.bz2
 ```
-extract and move to the webroot
+extract and move to the webroot. Change ownership and delete install files
 ```bash
 tar -xjvf latest.tar.bz2
 sudo cp -r nextcloud /var/www
