@@ -293,7 +293,7 @@ Edit config.php file.
 ```bash
 sudo nano /var/www/nextcloud/config/config.php
 ```
-replace the array by this
+Set the trusted_domains array
 ```bash
   0 => 'cloud.x_youromain.com',
 ```
@@ -322,7 +322,7 @@ We wanna use crontab instead of AJAX.
 ```bash
 sudo crontab -u www-data -e
 ```
-press 1 and insert at the end
+press 1 to use nano and insert at the end
 ```bash
 */5  *  *  *  * php -f /var/www/nextcloud/cron.php
 ```
