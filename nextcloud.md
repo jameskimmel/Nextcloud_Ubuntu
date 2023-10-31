@@ -23,9 +23,8 @@ Install all php modules.
 sudo apt install libapache2-mod-php php-gd php-posix php-mysql php-ctype php-curl php-mbstring php-gmp php-dom php-bcmath php-xml php-imagick php-zip php-bz2 php-intl php-imagick php-redis php-apcu
 ```
 ## MariaDB
-Use the integrated guide to secure Mariadb
-```bash
-mariadb-secure-installation
+Secure MariaDB
+```bashmariadb-secure-installation
 ```
 Change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
 ```bash
