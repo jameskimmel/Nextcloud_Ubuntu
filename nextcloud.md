@@ -28,10 +28,7 @@ Install all php modules.
 sudo apt install libapache2-mod-php php-gd php-posix php-mysql php-ctype php-curl php-mbstring php-gmp php-dom php-bcmath php-xml php-imagick php-zip php-bz2 php-intl php-imagick php-redis php-apcu
 ```
 ## MariaDB
-Secure MariaDB
-```bash
-sudo mariadb-secure-installation
-```
+
 Change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
 ```bash
 sudo nano /etc/mysql/conf.d/nextcloud.cnf
@@ -70,6 +67,11 @@ FLUSH PRIVILEGES;
 exit;
 ```
 You should see 3 times a "Query OK" line and a "Bye" at the end.
+
+Secure MariaDB
+```bash
+sudo mariadb-secure-installation
+```
 
 ## Nextcloud
 Download Nextcloud, verify, extract and move to the webroot.
