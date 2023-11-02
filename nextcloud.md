@@ -1,8 +1,9 @@
 # Example installation on Ubuntu 22.04.03 LTS with Apache2, APCu, redis and mariadb behind a NGINX proxy, no Docker, no Snap
 
 ## Who is this for?
-This is currently still a draft! Please don't use this in production! This is an example installation for Ubuntu users who want to host a Nextcloud instance behind a NGINX proxy. No Docker, no Snap. 
-The admin center should show no warnings and the instance should get a perfect security score from scan.nextcloud.com.
+This is an example installation for Ubuntu users who want to host a Nextcloud instance behind a NGINX proxy. No Docker, no Snap.
+It assumes that you have a working NGINX proxy server.
+The goal of this guide is to have no warnings in the admin center and the instance should get a perfect security score from scan.nextcloud.com.
 There are some placeholder values or variables that always start with x_. You need to replace them with your data. 
 This is the structure of the setup used in this guide.
 
@@ -401,21 +402,7 @@ To start APCu automatically use this command and replace the PHP version 8.1 if 
 sudo -u www-data php8.1 --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
 ```
 
-
-# NFS mount
-This is not finished. Systemd should only start nextcloud after the mount is successful.  
-
-To use an NFS mount instead of the /var/www/data directory, we should do these steps at the beginning.
-Todo: Setup systemd, so Nextcloud only starts after the mount is done. 
-```bash
-sudo apt install nfs-common
-sudo  nano /etc/fstab
-```
-add
-```config
-x_IPv4_mountpoint:/mnt/pool/Nextcloud /mnt/nextcloud  nfs defaults 0 0
-```
-
+Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com. 
 
 
 
