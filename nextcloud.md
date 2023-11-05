@@ -10,8 +10,16 @@ This is the structure of the setup used in this guide.
 ![setup](https://github.com/jameskimmel/Nextcloud_Ubuntu/assets/17176225/a5aae0e5-6560-4c4f-9a6d-cf062b1fdb8b)
 
 ## Split DNS
-This guide assumes you have some kind of split DNS running. Why is this necessary? Lets assume your WAN IPv4 is 85.29.10.1 and your NGINX Proxy has the IP 192.168.1.10 and your domain is cloud.yourdomain.com. 
-If you are on the road and try to connect to your Nextcloud, your client will ask "Hey what IP is cloud.yourdomain.com?" some DNS server will answer with 85.29.10.1. Then traffic will go to your firewall and some kind of NAT will redirect it to your NGINX Proxy on 192.168.1.10. But if you are on your local network, that probably will not work, because your firewall only NATs from WAN to LAN and not LAN to LAN. There are two simple solutions to this. First is to use IPv6 where you don't need NAT at all. With IPv6, your NGIXN host has a public IPv6 and there is no NAT needed (still need to open firwall ports though). Unlike IPv4, external and internal IP are the same for IPv6. The second method is to override your local DNS server. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it shoudl answer it with 192.168.1.10. This is mostly done by unbound overrides. Because most routers will not be able to do this, you maybe need to look into setting up a pihole DNS server.
+This guide assumes you have some kind of split DNS . Why is this necessary? 
+Lets assume your WAN IPv4 is 85.29.10.1 and your NGINX Proxy has the IP 192.168.1.10 and your domain is cloud.yourdomain.com. 
+
+If you are on the road and try to connect to your Nextcloud, your client will ask "Hey what IP is cloud.yourdomain.com?" some DNS server will answer with 85.29.10.1.
+Then traffic will go to your firewall and some kind of NAT will redirect it to your NGINX Proxy on 192.168.1.10. 
+
+But if you are on your local network, that probably will not work, because your firewall only NATs from WAN to LAN and not LAN to LAN. 
+There are two simple solutions to this. 
+First is to use IPv6 where you don't need NAT at all. With IPv6, your NGIXN host has a public IPv6 and there is no NAT needed (still need to open firwall ports though). Unlike IPv4, external and internal IP are the same for IPv6. 
+The second method is to override your local DNS server. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it shoudl answer it with 192.168.1.10. This is mostly done by unbound overrides. Because most routers will not be able to do this, you maybe need to look into setting up a pihole DNS server.
 
 ## Getting ready
 ```bash
