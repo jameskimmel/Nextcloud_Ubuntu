@@ -206,7 +206,8 @@ This will create a cert and also change your config to rediret all traffic to ht
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
 ```
-edit NGINX to look like this. At the time of writing, certbot will not automatically create http2 in the two listenings. This is needed so NGINX does not throw warnings. 
+At the time of writing this, there is still an open issue for certbot (https://github.com/certbot/certbot/issues/3646). 
+To not get any warnings from NGINX, add 'http2' in the two ssl listen lines.
 ```NGINX
 server {
     server_name cloud.x_youromain.com;
@@ -267,6 +268,21 @@ server {
     location /.well-known/caldav {
     return 301 $scheme://$host/remote.php/dav;
     }
+
+}
+
+
+server {
+    if ($host = cloud.x_youromain.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen      80;
+    listen      [::]:80;
+    server_name cloud.x_youromain.com;
+    return 404; # managed by Certbot
+
 
 }
 
