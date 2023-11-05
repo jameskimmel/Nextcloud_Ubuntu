@@ -179,7 +179,7 @@ sudo systemctl reload apache2
 
 
 ## NGINX settings on the reverse Proxy
-Create an emtpy site without ssl.
+This guide assumes you already have a NGINX reverse Proxy up and running. Create an emtpy site without ssl.
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
 ```
