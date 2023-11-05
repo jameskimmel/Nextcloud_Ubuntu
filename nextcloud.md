@@ -216,7 +216,11 @@ Now we let certbot create a cert. For certbot to be sucessfull, you need an A or
 sudo certbot
 ```
 Follow the certbot instructions.
-This will create a cert and also change your config to rediret all traffic to https.
+This will create a cert and also change your config to redirect all traffic to https.
+To test if the automatic removal is working run
+```bash
+sudo certbot renew --dry-run
+```
 
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
