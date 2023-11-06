@@ -253,7 +253,7 @@ server {
     add_header Referrer-Policy           "no-referrer" always;
     add_header Content-Security-Policy   "default-src 'self' http: https: ws: wss: data: blob: 'unsafe-inline'; frame-ancestors 'self';" al>
     add_header Permissions-Policy        "interest-cohort=()" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
 
 
     # logging
