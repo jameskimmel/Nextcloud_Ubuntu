@@ -446,6 +446,36 @@ To start APCu automatically use this command and replace the PHP version 8.1 if 
 sudo -u www-data php8.1 --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
 ```
 
+## Configure Apache2 HSTS
+Probably only cosmetics, because it is already done by the proxy. Anyway setting this will remove the warning in the admin center.
+```bash
+sudo nano /etc/apache2/sites-available/nextcloud.conf
+```
+insert mod_headers.c     
+
+```bash
+<VirtualHost *:80>
+  DocumentRoot /var/www/nextcloud/
+  ServerName  cloud.salzmann.solutions
+
+  <Directory /var/www/nextcloud/>
+    Require all granted
+    AllowOverride All
+    Options FollowSymLinks MultiViews
+
+    <IfModule mod_dav.c>
+      Dav off
+    </IfModule>
+
+    <IfModule mod_headers.c>
+      Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+    </IfModule>
+
+  </Directory>
+</VirtualHost>
+```
+save and exit.
+
 Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com. 
 
 
