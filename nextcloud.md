@@ -311,7 +311,11 @@ server {
 }
 
 ```
-
+Check your NGINX config and reload
+```bash
+sudo nginx -t
+sudo nginx -s reload
+```
 
 
 ## Install Nextcloud 
@@ -470,7 +474,10 @@ insert mod_headers.c
   </Directory>
 </VirtualHost>
 ```
-save and exit.
+save and exit. Reload
+```bash
+sudo systemctl reload apache2
+```
 
 Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com. 
 
