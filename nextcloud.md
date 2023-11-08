@@ -199,7 +199,6 @@ sudo systemctl reload apache2
 
 ## NGINX settings on the reverse Proxy
 This guide assumes you already have a NGINX reverse Proxy up and running. 
-https://nginx.org/en/linux_packages.html#Ubuntu
 It also assumes that you have Certbot installed. 
 Create an emtpy site without ssl.
 ```bash
