@@ -192,32 +192,25 @@ insert:
 Enable site and mods:
 ```bash
 sudo a2ensite nextcloud.conf
-sudo a2enmod rewrite headers env dir mime
 sudo systemctl reload apache2
 ```
 
+Braucht es dies später? 
+sudo a2enmod rewrite headers env dir mime
 
-## NGINX settings on the reverse Proxy
-This guide assumes you already have a NGINX reverse Proxy up and running. 
-It also assumes that you have Certbot installed. 
-Create an emtpy site without ssl.
+
+
+## Cerbot
+This guide assumes you have Certbot installed. If you dont have it installed yet, here is the currently recommended way to do it:
 ```bash
-sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
+sudo apt install snapd
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
 ```
 
-```NGINX
-server {
-    listen      80;
-    listen      [::]:80;
-    server_name cloud.x_yourdomain.com;
-}
-```
-```bash
-sudo nginx -t
-sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.conf /etc/nginx/sites-enabled/cloud.x_yourdomain.conf
-sudo nginx -s reload
-```
-Now we let certbot create a cert. For certbot to be sucessfull, you need an A or AAAA record that points to your proxy with the open port 80.
+For certbot to be sucessfull, you need an A or AAAA record that points to your proxy with the open port 80.
+snap1
+
 ```bash
 sudo certbot
 ```
