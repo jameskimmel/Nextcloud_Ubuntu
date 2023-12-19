@@ -455,7 +455,7 @@ insert mod_headers.c
 ```bash
 <VirtualHost *:80>
   DocumentRoot /var/www/nextcloud/
-  ServerName  cloud.salzmann.solutions
+  ServerName  cloud.x_youromain.com
 
   <Directory /var/www/nextcloud/>
     Require all granted
