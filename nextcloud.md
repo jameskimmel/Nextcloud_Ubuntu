@@ -22,6 +22,7 @@ The second method is to override your local DNS server. Tell your DNS server, th
 
 ## HTTP Strict Transport Security (HSTS)
 This guide assumes that you have preloaded HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
+If you don't wan't to use this, you need a small change later on.
 To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
 
 ## Getting ready
@@ -351,7 +352,7 @@ php -r 'phpinfo();' | grep opcache.enable
 ```
 
 ## Configure Apache2 HSTS
-We set the strict transport security.
+We set the strict transport security. 
 
 ```bash
 sudo nano /etc/apache2/sites-available/nextcloud-le-ssl.conf
@@ -389,6 +390,10 @@ Include /etc/letsencrypt/options-ssl-apache.conf
 save and exit. Reload
 ```bash
 sudo systemctl reload apache2
+```
+If you decided against HSTS, ditch the "preload" in the IfModule on use it like this instead
+```bash
+      Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
 ```
 
 ### Pretty URLs 
