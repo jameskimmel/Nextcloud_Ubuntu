@@ -290,6 +290,12 @@ Encryption: STARTTLS
 Needs authentification, sender and user is me@mydomain.com 
 AppPasswort
 ```
+here i need to fix stuff
+
+
+
+
+
 
 ## Caching
 Check if Opcache is working
