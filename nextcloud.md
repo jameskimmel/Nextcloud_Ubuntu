@@ -192,12 +192,20 @@ insert:
 Enable site and mods:
 ```bash
 sudo a2ensite nextcloud.conf
-sudo systemctl reload apache2
+sudo a2enmod rewrite
+sudo a2enmod headers
+sudo a2enmod env
+sudo a2enmod dir
+sudo a2enmod mime
+sudo service apache2 restart
 ```
 
-Braucht es dies später? 
-sudo a2enmod rewrite headers env dir mime
+### Pretty URLs 
+Pretty URLs remove the index.php-part in all Nextcloud URLs, for example in sharing links like https://example.org/nextcloud/index.php/s/Sv1b7krAUqmF8QQ, making URLs shorter and thus prettier.
+todo1
 
+'overwrite.cli.url' => 'https://example.org/',
+'htaccess.RewriteBase' => '/',
 
 
 ## Cerbot
@@ -209,106 +217,18 @@ sudo ln -s /snap/bin/certbot /usr/bin/certbot
 ```
 
 For certbot to be sucessfull, you need an A or AAAA record that points to your proxy with the open port 80.
-snap1
 
 ```bash
 sudo certbot
 ```
 Follow the certbot instructions.
-This will create a cert and also change your config to redirect all traffic to https.
+If you have done everything right, it should automatically detect your hostname. 
+If you are unable to get a cert, most of the time there is something wrong with your firewall opening the port 80 or your DNS settings.
+Certbot will create a cert and also change your config to redirect all traffic to https.
 To test if the automatic removal is working run
 ```bash
 sudo certbot renew --dry-run
 ```
-
-```bash
-sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
-```
-At the time of writing this, there is still an open issue for certbot (https://github.com/certbot/certbot/issues/3646). 
-To not get any warnings from NGINX, add 'http2' in the two ssl listen lines.
-```NGINX
-server {
-    server_name cloud.x_youromain.com;
-
-
-    listen [::]:443 ssl http2 ipv6only=on; # managed by Certbot
-    listen 443 ssl http2; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/cloud.x_youromain.com/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/cloud.x_youromain.com/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
-    # security headers
-#    add_header X-Content-Type-Options    "nosniff" always;
-#    add_header X-Robots-Tag              "noindex, nofollow" always;
-    add_header Referrer-Policy           "no-referrer" always;
-    add_header Content-Security-Policy   "default-src 'self' http: https: ws: wss: data: blob: 'unsafe-inline'; frame-ancestors 'self';" always;
-    add_header Permissions-Policy        "interest-cohort=()" always;
-    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
-
-    # logging
-    access_log              /var/log/nginx/access.log combined buffer=512k flush=1m;
-    error_log               /var/log/nginx/error.log warn;
-
-    # reverse proxy
-    location / {
-        proxy_pass            http://x_nextcloud_host_IPv4/;
-        proxy_set_header Host $host;
-
-        proxy_http_version                 1.1;
-        proxy_cache_bypass                 $http_upgrade;
-
-        # Proxy SSL
-        proxy_ssl_server_name              on;
-
-        # Proxy headers
-        proxy_set_header Upgrade           $http_upgrade;
-        proxy_set_header Connection        $connection_upgrade;
-        proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header Forwarded         $proxy_add_forwarded;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host  $host;
-        proxy_set_header X-Forwarded-Port  $server_port;
-
-        # Proxy timeouts
-        proxy_connect_timeout              600s;
-        proxy_send_timeout                 600s;
-        proxy_read_timeout                 600s;
-    }
-
-    location /.well-known/carddav {
-    return 301 $scheme://$host/remote.php/dav;
-    }
-
-    location /.well-known/caldav {
-    return 301 $scheme://$host/remote.php/dav;
-    }
-
-}
-
-
-server {
-    if ($host = cloud.x_youromain.com) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
-
-
-    listen      80;
-    listen      [::]:80;
-    server_name cloud.x_youromain.com;
-    return 404; # managed by Certbot
-
-
-}
-
-```
-Check your NGINX config and reload
-```bash
-sudo nginx -t
-sudo nginx -s reload
-```
-
 
 ## Install Nextcloud 
 You can install Nextcloud with that command or by using the WebPage.
