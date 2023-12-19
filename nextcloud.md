@@ -393,7 +393,7 @@ sudo systemctl reload apache2
 ```
 If you decided against HSTS, ditch the "preload" in the IfModule on use it like this instead
 ```bash
-      Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+      Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
 ```
 
 ### Pretty URLs 
