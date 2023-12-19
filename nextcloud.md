@@ -1,7 +1,5 @@
 # Example installation on Ubuntu 22.04.03 LTS with Apache2, APCu, redis, mariadb and Apache2, no Docker, no Snap
 
-Work in progress, please don't use yet!
-
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.
 The goal of this guide is to have no warnings in the admin center and the instance should get a perfect security score from scan.nextcloud.com.
@@ -24,7 +22,6 @@ The second method is to override your local DNS server. Tell your DNS server, th
 
 ## HTTP Strict Transport Security (HSTS)
 This guide assumes that you have preloaded HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
-If you don't wanna do this, you would have to remove "add_header Strict-Transport-Security" in the later NGINX settings. 
 To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
 
 ## Getting ready
@@ -290,18 +287,9 @@ Encryption: STARTTLS
 Needs authentification, sender and user is me@mydomain.com 
 AppPasswort
 ```
-here i need to fix stuff
-
-
-
-
-
 
 ## Caching
-Check if Opcache is working
-```bash
-php -r 'phpinfo();' | grep opcache.enable
-```
+
 ### Redis
 Add redis to the www-data group
 ```bash
@@ -357,17 +345,25 @@ To start APCu automatically use this command and replace the PHP version 8.1 if 
 sudo -u www-data php8.1 --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
 ```
 
-## Configure Apache2 HSTS
-Probably only cosmetics, because it is already done by the proxy. Anyway setting this will remove the warning in the admin center.
+Check if Opcache is working
 ```bash
-sudo nano /etc/apache2/sites-available/nextcloud.conf
+php -r 'phpinfo();' | grep opcache.enable
 ```
-insert mod_headers.c     
+
+## Configure Apache2 HSTS
+We set the strict transport security.
 
 ```bash
-<VirtualHost *:80>
+sudo nano /etc/apache2/sites-available/nextcloud-le-ssl.conf
+```
+Insert the IfModule.
+Your setting should look like this:
+
+```bash
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
   DocumentRoot /var/www/nextcloud/
-  ServerName  cloud.salzmann.solutions
+  ServerName  cloud.yourdomain.com
 
   <Directory /var/www/nextcloud/>
     Require all granted
@@ -383,7 +379,12 @@ insert mod_headers.c
     </IfModule>
 
   </Directory>
+
+SSLCertificateFile /etc/letsencrypt/live/cloud.yourdomain.com/fullchain.pem
+SSLCertificateKeyFile /etc/letsencrypt/live/cloud.yourdomain.com/privkey.pem
+Include /etc/letsencrypt/options-ssl-apache.conf
 </VirtualHost>
+</IfModule>
 ```
 save and exit. Reload
 ```bash
@@ -400,6 +401,4 @@ sudo nano /var/www/nextcloud/config/config.php
 sudo -u www-data php /var/www/nextcloud/occ maintenance:update:htaccess
 ```
 
-Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com. 
-
-
+Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com!
