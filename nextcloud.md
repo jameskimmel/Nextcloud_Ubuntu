@@ -200,14 +200,6 @@ sudo a2enmod mime
 sudo service apache2 restart
 ```
 
-### Pretty URLs 
-Pretty URLs remove the index.php-part in all Nextcloud URLs, for example in sharing links like https://example.org/nextcloud/index.php/s/Sv1b7krAUqmF8QQ, making URLs shorter and thus prettier.
-todo1
-
-'overwrite.cli.url' => 'https://example.org/',
-'htaccess.RewriteBase' => '/',
-
-
 ## Cerbot
 This guide assumes you have Certbot installed. If you dont have it installed yet, here is the currently recommended way to do it:
 ```bash
@@ -216,7 +208,7 @@ sudo snap install --classic certbot
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 ```
 
-For certbot to be sucessfull, you need an A or AAAA record that points to your proxy with the open port 80.
+For certbot to be sucessfull, you need an A or AAAA record that points to your instance with the open port 80.
 
 ```bash
 sudo certbot
@@ -228,6 +220,13 @@ Certbot will create a cert and also change your config to redirect all traffic t
 To test if the automatic removal is working run
 ```bash
 sudo certbot renew --dry-run
+```
+
+## Enable SSL
+```bash
+sudo a2enmod ssl
+sudo a2ensite default-ssl
+sudo service apache2 reload
 ```
 
 ## Install Nextcloud 
@@ -242,8 +241,7 @@ sudo -u www-data php occ  maintenance:install \
 --data-dir='/var/www/nextcloud/data'
 ```
 
-If we navigate now to https://cloud.x_youromain.com, we should see a warning that we are not trusted, because we have not set up the proxy configs yet.
-
+If we navigate now to https://cloud.x_youromain.com, we should see a warning that try to connect over an untrusted domain. 
 
 ## PHP config settings
 Edit config.php file. 
@@ -254,17 +252,11 @@ Set the trusted_domains array
 ```bash
   0 => 'cloud.x_youromain.com',
 ```
-also change or add these settings:
+while we are at it, you could also add these settings to match your locales:
 ```bash
-'trusted_proxies'   => ['x_NGINX_IPv4'],
 'default_language' => 'de',
 'default_locale' => 'de_DE',
 'default_phone_region' => 'DE',
-'overwrite.cli.url' => 'https://cloud.x_youromain.com',
-'overwriteprotocol' => 'https',
-'overwritewebroot' => '/',
-'overwritecondaddr' => 'x_NGINX_IPv4',
-'htaccess.RewriteBase' => '/',
 ```
 save and exit
 
@@ -273,6 +265,7 @@ update the settings by
 cd /var/www/nextcloud/
 sudo -u www-data php occ maintenance:update:htaccess
 ```
+Now you should be able to access cloud.x_youromain.com without untrusted domain warning. If the warning is still there, try to access it over your mobile networt to rule out an error in your local DNS settings. 
 
 ## Set up crontab
 We wanna use crontab instead of AJAX.
@@ -389,6 +382,16 @@ insert mod_headers.c
 save and exit. Reload
 ```bash
 sudo systemctl reload apache2
+```
+
+### Pretty URLs 
+Pretty URLs remove the index.php-part in all Nextcloud URLs, for example in sharing links like https://example.org/nextcloud/index.php/s/Sv1b7krAUqmF8QQ, making URLs shorter and thus prettier.
+
+```bash
+sudo nano /var/www/nextcloud/config/config.php
+'overwrite.cli.url' => 'https://example.org/',
+'htaccess.RewriteBase' => '/',
+sudo -u www-data php /var/www/nextcloud/occ maintenance:update:htaccess
 ```
 
 Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com. 
