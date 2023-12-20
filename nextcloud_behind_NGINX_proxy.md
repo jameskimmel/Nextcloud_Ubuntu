@@ -22,11 +22,11 @@ First is to use IPv6 where you don't need NAT at all. With IPv6, your NGIXN host
 The second method is to override your local DNS server. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it should answer it with 192.168.1.10. This is done by unbound overrides. Most home routers don't offer unbound, so you may need to look into setting up a pi-hole DNS server.
 
 ## HTTP Strict Transport Security (HSTS)
-This guide assumes that you have preloaded HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
-If you don't wanna do this, you would have to remove "add_header Strict-Transport-Security" in the later NGINX settings. 
+This step is optional.
+You can preloaded HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
+That way you gain security by forcing all your domains and subdomain to use HTTPS. 
 To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
-
-
+If you don't wan't to use this, you need to make a small change in Apache and NGINX by removing "preload". 
 
 ## Getting ready
 ```bash
@@ -310,7 +310,8 @@ server {
 }
 
 ```
-Check your NGINX config and reload
+If you decided against HTST, remove the preload. 
+Check your NGINX config and reload. 
 ```bash
 sudo nginx -t
 sudo nginx -s reload
@@ -477,6 +478,12 @@ save and exit. Reload
 ```bash
 sudo systemctl reload apache2
 ```
+If you decided against HSTS, ditch the "preload" in the IfModule on use it like this instead
+```bash
+      Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
+```
+
+
 
 Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com. 
 
