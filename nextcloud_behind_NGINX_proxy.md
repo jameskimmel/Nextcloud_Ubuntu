@@ -19,7 +19,7 @@ Then traffic will go to your firewall and some kind of NAT will redirect it to y
 But if you are on your local network, that probably will not work, because your firewall only NATs from WAN to LAN and not LAN to LAN. 
 There are two simple solutions to this. 
 First is to use IPv6 where you don't need NAT at all. With IPv6, your NGIXN host has a public IPv6 and there is no NAT needed (still need to open firewall ports though). Unlike IPv4, external and internal IP are the same for IPv6. 
-The second method is to override your local DNS server. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it should answer it with 192.168.1.10. This is mostly done by unbound overrides. Because most routers will not be able to do this, you may need to look into setting up a pi-hole DNS server.
+The second method is to override your local DNS server. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it should answer it with 192.168.1.10. This is done by unbound overrides. Most home routers don't offer unbound, so you may need to look into setting up a pi-hole DNS server.
 
 ## HTTP Strict Transport Security (HSTS)
 This guide assumes that you have preloaded HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
