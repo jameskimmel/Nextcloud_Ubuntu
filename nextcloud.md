@@ -1,8 +1,8 @@
-# Example installation on Ubuntu 22.04.03 LTS with Apache2, APCu, redis, mariadb and Apache2, no Docker, no Snap
+# Example installation on Ubuntu 22.04.03 LTS with Apache2, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.
-The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers, because you need to switch from one topic to another and have to read up on multiple things. This guide should offer you a more streamlined expirience.
+The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to switch from one topic to another and have to read up on multiple things. This guide should offer you a more streamlined experience.
 
 There are some placeholder values or variables that always start with x_. You need to replace them with your data. 
 This is the structure of the setup used in this guide.
@@ -10,7 +10,7 @@ This is the structure of the setup used in this guide.
 ![Unbenanntes Diagramm drawio](https://github.com/jameskimmel/Nextcloud_Ubuntu/assets/17176225/fa1cdce1-7e24-4cdf-8845-b354a0a85b71)
 
 ## Split DNS
-This guide assumes you have some kind of split DNS. This is necessary, if you Nextcloud instance is inside your LAN and you don't use a VPS. Why is this necessary? 
+This guide assumes you have some kind of split DNS. This is necessary, if your Nextcloud instance is inside your LAN and you don't use a VPS. Why is this necessary? 
 Let's assume your WAN IPv4 is 85.29.10.1 and your nextcloud instance has the IP 192.168.1.10 and your domain is cloud.yourdomain.com. 
 
 If you are on the road and try to connect to your Nextcloud, your client will ask "Hey what IP is cloud.yourdomain.com?" a DNS server will answer with "85.29.10.1".
@@ -29,7 +29,7 @@ sudo dpkg-reconfigure unattended-upgrades
 ```
 
 ## Install packages
-Nextcloud currently recommends PHP 8.2 but Ubuntu 22.04 comes with PHP8.1. I think it is easier to use a slightly outdated PHP version, than to add Ondrejs PHP repositories. 
+Nextcloud currently recommends PHP 8.2 but Ubuntu 22.04 comes with PHP 8.1. I think it is easier to use a slightly outdated PHP version than to add PHP repositories. 
 We install all the software that is needed plus some optional software so we won't get warnings in the Nextcloud Admin Center.
 
 ```bash
@@ -349,10 +349,10 @@ php -r 'phpinfo();' | grep opcache.enable
 
 ## HTTP Strict Transport Security (HSTS)
 This step is optional.
-You can preloaded HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
-That way you gain security by forcing all your domains and subdomain to use HTTPS. 
+You can preload HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
+That way you gain security by forcing all your domains and subdomains to use HTTPS. 
 To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
-If you don't wan't to use this, you need to make a small change in Apache. 
+If you don't want to use this, you need to make a small change in Apache and NGINX by removing "preload". 
 
 ## Configure Apache2 HSTS
 We set the strict transport security. 
