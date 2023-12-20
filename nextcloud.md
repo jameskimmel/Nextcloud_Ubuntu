@@ -2,7 +2,8 @@
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.
-The goal of this guide is to have no warnings in the admin center and the instance should get a perfect security score from scan.nextcloud.com.
+The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers, because you need to switch from one topic to another and have to read up on multiple things. This guide should offer you a more streamlined expirience.
+
 There are some placeholder values or variables that always start with x_. You need to replace them with your data. 
 This is the structure of the setup used in this guide.
 
