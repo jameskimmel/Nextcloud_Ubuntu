@@ -11,7 +11,7 @@ This is the structure of the setup used in this guide.
 
 ## Split DNS
 This guide assumes you have some kind of split DNS. This is necessary, if you Nextcloud instance is inside your LAN and you don't use a VPS. Why is this necessary? 
-Let's assume your WAN IPv4 is 85.29.10.1 and your NGINX Proxy has the IP 192.168.1.10 and your domain is cloud.yourdomain.com. 
+Let's assume your WAN IPv4 is 85.29.10.1 and your nextcloud instance has the IP 192.168.1.10 and your domain is cloud.yourdomain.com. 
 
 If you are on the road and try to connect to your Nextcloud, your client will ask "Hey what IP is cloud.yourdomain.com?" a DNS server will answer with "85.29.10.1".
 Then traffic will go to your firewall and some kind of NAT will redirect it to your Nextcloud instance on 192.168.1.10. 
