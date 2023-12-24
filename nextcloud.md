@@ -208,7 +208,7 @@ For certbot to be sucessfull, you need an A or AAAA record that points to your i
 sudo certbot
 ```
 Follow the certbot instructions.
-If you have done everything right, it should automatically detect your hostname. 
+If you have done everything right, it should automatically detect hostnames from the Apache2 configs. 
 If you are unable to get a cert, most of the time there is something wrong with your firewall opening the port 80 or your DNS settings.
 Certbot will create a cert and also change your config to redirect all traffic to https.
 To test if the automatic removal is working run
