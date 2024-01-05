@@ -36,7 +36,10 @@ sudo dpkg-reconfigure unattended-upgrades
 ```
 
 ## Install packages
-Nextcloud currently recommends PHP 8.2 but Ubuntu 22.04 comes with PHP 8.1. I think it is easier to use a slightly outdated PHP version than to add PHP repositories. 
+Different versions of Ubuntu may have differing versions of PHP, for example Ubuntu 22.04 ships PHP 8.1, which is not the currently recommended version by Nextcloud. Nextcloud currently recommends PHP 8.2. Adding optional repositories to apt's sources (e.g. Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) or [dpa for Debian](https://packages.sury.org/php/)) is beyond the scope of this tutorial, and will require modifying the name of libapache2-mod-php and all php modules to include the specific version number, e.g. libapache2-mod-php8.2 php8.2-apcu php8.2-bcmat and so on.I think it is simpler to use the Ubuntu PHP version, but adding a PPA is also not that hard. The choice is yours :)
+In this tutorial we will use the included PHP packages from Ubuntu. While 8.1 is not recommended, it is still currently supported by Nextcloud. 
+For up to date system requiremets, please visit [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html)
+
 We install all the software that is needed plus some optional software so we won't get warnings in the Nextcloud Admin Center.
 
 ```bash
