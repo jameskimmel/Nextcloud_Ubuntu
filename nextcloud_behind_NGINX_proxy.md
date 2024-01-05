@@ -43,12 +43,33 @@ For up to date system requiremets, please visit [Nextcloud admin manual](https:/
 We install all the software that is needed plus some optional software so we won't get warnings in the Nextcloud Admin Center.
 
 ```bash
-sudo apt install apache2 mariadb-server exif imagemagick redis-server bzip2
+sudo apt install apache2 \
+  bzip2 \
+  exif \
+  imagemagick \
+  mariadb-server \
+  redis-server
 ```
 
 Install all php modules.
 ```bash
-sudo apt install libapache2-mod-php php-gd php-posix php-mysql php-ctype php-curl php-mbstring php-gmp php-dom php-bcmath php-xml php-imagick php-zip php-bz2 php-intl php-imagick php-redis php-apcu
+sudo apt install libapache2-mod-php \
+  php-apcu \
+  php-bcmath \
+  php-bz2 \
+  php-ctype \
+  php-curl \
+  php-dom \
+  php-gd \
+  php-gmp \
+  php-imagick \
+  php-intl \
+  php-mbstring \
+  php-mysql \
+  php-posix \
+  php-redis \
+  php-xml \
+  php-zip
 ```
 ## MariaDB
 
