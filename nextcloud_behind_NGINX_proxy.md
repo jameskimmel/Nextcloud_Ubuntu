@@ -512,6 +512,13 @@ If you decided against HSTS, ditch the "preload" in the IfModule on use it like 
 ```bash
       Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
 ```
+### maintenance window
+We can define when a the maintenance window starts (UTC time!). By default, the maintenance windows ends 4 hours after the start. 
+We start it at 3 in the morning.
+```bash
+sudo -u www-data php /var/www/nextcloud/occ config:system:set maintenance_window_start --type=integer --value=1
+```
+
 Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com. 
 
 ### NFS share as data directory (optional)
