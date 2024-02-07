@@ -438,3 +438,30 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:update:htaccess
 ```
 
 Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com!
+
+### NFS share as data directory (optional)
+Instead of using local storage, you can move the data directory to a NFS mount. 
+```bash
+sudo apt install nfs-common
+```
+Create a folder and a mountpoint in fstab. 
+In this example the data dir is set to /mnt/nextcloud/data. Make sure the user www-data has write access. 
+```bash
+sudo nano /var/www/nextcloud/config/config.php
+```
+add the line
+```bash
+'datadirectory' => '/mnt/nextcloud/data',
+```
+### temp path for Update (optional)
+Updates can take a long time if your data directory is on a NFS share, because Nextcloud will create a backup first. 
+To speed it up, create a temp backup and update dir.
+```bash
+sudo mkdir /var/www/update
+sudo chown www-data:www-data /var/www/update/
+sudo nano /var/www/nextcloud/config/config.php
+```
+add the line
+```bash
+'updatedirectory' => '/var/www/update',
+```
