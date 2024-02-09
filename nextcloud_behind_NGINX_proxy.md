@@ -27,6 +27,14 @@ But if you are on your local network, that probably will not work, because your 
 The easiest way to solve this is to use split DNS. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it should answer it with 192.168.1.10. This is done by unbound overrides. Most home routers don't offer unbound, so you may need to look into setting up a pi-hole DNS server.
 Another option that should work (but I have not looked into it!) is NAT overrides. 
 
+Since Nextcloud 28, there are also some MIME checks in the admin center. For these checks to work, the Nextcloud instance needs to be able to connect to the NGINX proxy. For that you either need SplitDNS or you need to set the /etc/hosts like this:
+
+```bash
+sudo nano /etc/hosts
+x_nextcloud_host_IPv4 cloud.x_yourdomain.com nginxproxy
+```
+
+
 ## HTTP Strict Transport Security (HSTS)
 This step is optional.
 You can preload HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
