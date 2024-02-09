@@ -238,6 +238,7 @@ sudo systemctl reload apache2
 ## NGINX settings on the reverse Proxy
 This guide assumes you already have a NGINX reverse Proxy up and running. 
 It also assumes that you have Certbot installed. 
+There is an excellent tool for creating config files from DigitalOcean do.co/nginxconfig
 Create an emtpy site without ssl.
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
