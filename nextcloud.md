@@ -154,6 +154,7 @@ upload_max_filesize = 50G
 post_max_size = 0
 max_execution_time = 3600
 date.timezone = Europe/Amsterdam
+opcache.interned_strings_buffer=16
 ```
 Save and exit. Reload apache2
   
