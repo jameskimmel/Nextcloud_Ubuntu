@@ -174,7 +174,7 @@ and insert
 Now can see the default Apache2 page at 
 http://x_nextcloud_host_IPv4.
 To see the PHP settings go to 
-http://x_nextcloud_host_IPv4/phphinfo.php
+http://x_nextcloud_host_IPv4/phpinfo.php
 You should find the values we defined. 
 To disable that page and delete the html folder, run 
 ```bash
