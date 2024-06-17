@@ -13,11 +13,11 @@ This is the structure of the setup used in this guide.
 
 If you want to host Nextcloud in your home and want to access it remotely or even share some files externally, there are some network requirements. 
 You need a real, public routable, none Carrier-grade NAT (CG-NAT) IPv4 address. 
-If you don't have a real IPv4 address, you could ask your ISP to give you one or use IPv6 or a VPN instead. The latter two options don't really work if you want to share files externally. 
+If you don't have a real IPv4 address, you could ask your ISP to give you one. Some ISPs will give you one for free, others charge you 5$ a month. Some call it "Gaming IP" or "NAS IP". You could also use IPv6 or a VPN instead. If you want to share files externally, only having IPv6 isn't great, since you don't know if all external users are able to use IPv6.  
 You also need split DNS described in the next paragraph. 
 
-### Split DNS
-Why is split DNS this necessary? 
+### Split DNS or Hairpin NAT
+Why is split DNS or Hairpin NAT even needed? 
 Let's assume your WAN IPv4 is 85.29.10.1 and your NGINX Proxy has the IP 192.168.1.10 and your domain is cloud.yourdomain.com.
 
 If you are on the road and try to connect to your Nextcloud, your client will ask "Hey, what IP is cloud.yourdomain.com?" a DNS server will answer with "85.29.10.1".
@@ -25,7 +25,7 @@ Then traffic will go to your firewall and some kind of NAT will redirect it to y
 
 But if you are on your local network, that probably will not work, because your firewall only NATs from WAN to LAN and not LAN to LAN. 
 The easiest way to solve this is to use split DNS. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it should answer it with 192.168.1.10. This is done by unbound overrides. Most home routers don't offer unbound, so you may need to look into setting up a pi-hole DNS server.
-Another option that should work (but I have not looked into it!) is NAT overrides. 
+Another option that should work (but I have not looked into it!) is Hairpin NAT. 
 
 Since Nextcloud 28, there are also some MIME checks in the admin center. For these checks to work, the Nextcloud instance needs to be able to connect to the NGINX proxy. For that you either need SplitDNS or you need to set the /etc/hosts like this:
 
