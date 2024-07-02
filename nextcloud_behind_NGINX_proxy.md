@@ -380,7 +380,10 @@ sudo nano /var/www/nextcloud/config/config.php
 ```
 Set the trusted_domains array
 ```bash
-  0 => 'cloud.x_youromain.com',
+  'trusted_domains' =>
+  array (
+    0 => 'cloud.x_youromain.com',
+  ),
 ```
 also change or add these settings:
 ```bash
