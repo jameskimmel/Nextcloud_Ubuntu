@@ -387,7 +387,10 @@ Set the trusted_domains array
 ```
 also change or add these settings:
 ```bash
-'trusted_proxies'   => ['x_NGINX_IPv4'],
+'trusted_proxies' =>
+  array (
+    0 => 'x_NGINX_IPv4',
+),
 'default_language' => 'de',
 'default_locale' => 'de_DE',
 'default_phone_region' => 'DE',
