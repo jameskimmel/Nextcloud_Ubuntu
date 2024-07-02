@@ -104,6 +104,11 @@ Reload mariadb
 sudo systemctl restart mariadb.service
 ```
 
+Secure MariaDB. Insert a root password, otherwise just use the defaults by pressing enter.
+```bash
+sudo mariadb-secure-installation
+```
+
 Create the database
 ```bash
 sudo mariadb
@@ -125,11 +130,6 @@ FLUSH PRIVILEGES;
 exit;
 ```
 You should see 3 times a "Query OK" line and a "Bye" at the end.
-
-Secure MariaDB. Insert a root password, otherwise just use the defaults by pressing enter.
-```bash
-sudo mariadb-secure-installation
-```
 
 ## Nextcloud
 Download Nextcloud
