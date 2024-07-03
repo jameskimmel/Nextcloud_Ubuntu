@@ -448,15 +448,11 @@ sudo nano /etc/redis/redis.conf
 ```
 uncomment  
 ```
-unixsocket  /var/run/redis/redis.sock
+unixsocket /run/redis/redis-server.sock
 ```
 Set  
 ```
 unixsocketperm to 770
-```
-If your using Ubuntu 24.04 you should instead uncomment  
-```
-unixsocket /run/redis/redis-server.sock
 ```
 Exit and save.
 Restart redis
