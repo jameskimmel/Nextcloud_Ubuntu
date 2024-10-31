@@ -1,6 +1,8 @@
-# Example installation on Ubuntu 22.04.03 LTS with Apache2, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
+# Example installation on Ubuntu 24.04.01 LTS with Apache2, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
 
 ## Who is this for?
+Will update soon, please don't use it yet!
+
 This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.
 The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to jump from one topic to another and have to read up on multiple things. This guide should offer you a more streamlined experience.
 
@@ -13,6 +15,7 @@ This is the structure of the setup used in this guide.
 
 If you want to host Nextcloud in your home and want to access it remotely or even share some files externally, there are some network requirements. 
 You need a real, public routable, none Carrier-grade NAT (CG-NAT) IPv4 address. 
+Don't know what CG-NAT is? [Test if you have a CG-NAT IPv4](https://github.com/jameskimmel/network-stuff/blob/main/CG-NAT.md).  
 If you don't have a real IPv4 address, you could ask your ISP to give you one. Some ISPs will give you one for free, others charge you 5$ a month. Some call it "Gaming IP" or "NAS IP". You could also use IPv6 or a VPN instead. If you want to share files externally, only having IPv6 isn't great, since you don't know if all external users are able to use IPv6.  
 You also need split DNS described in the next paragraph. 
 
@@ -50,11 +53,12 @@ sudo dpkg-reconfigure unattended-upgrades
 ```
 
 ## Install packages
-Different versions of Ubuntu may have differing versions of PHP, for example Ubuntu 22.04 ships PHP 8.1, which is not the currently recommended version by Nextcloud. Nextcloud currently recommends PHP 8.2. Adding optional repositories to apt's sources (e.g. Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) or [dpa for Debian](https://packages.sury.org/php/)) is beyond the scope of this tutorial, and will require modifying the name of libapache2-mod-php and all php modules to include the specific version number, e.g. libapache2-mod-php8.2 php8.2-apcu php8.2-bcmat and so on.I think it is simpler to use the Ubuntu PHP version, but adding a PPA is also not that hard. The choice is yours :)
-In this tutorial we will use the included PHP packages from Ubuntu. While 8.1 is not recommended, it is still currently supported by Nextcloud. 
-For up to date system requirements, please visit [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html)
+Different versions of Ubuntu may have differing versions of PHP, for example Ubuntu 24.04 ships PHP 8.3.6, which is by pure luck the currently recommended version by Nextcloud. If the PHP version does not match, you can add other repositories. Adding  repositories to apt's sources (e.g. Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) or [dpa for Debian](https://packages.sury.org/php/)) is beyond the scope of this tutorial.  
+I think it is simpler to use the Ubuntu PHP version, but adding a PPA is also not that hard. The choice is yours :)
+For up to date system requirements, please visit [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html)  
 
-We install all the software that is needed plus some optional software so we won't get warnings in the Nextcloud Admin Center.
+We install all the software that is needed plus some optional software so we won't get warnings in the Nextcloud Admin Center.  
+Ubuntu 24.04.01 comes with MariaDB 10.11.8 which is currently the recommended version. 
 
 ```bash
 sudo apt install apache2 \
@@ -118,8 +122,13 @@ You should now see "MariaDB [(none)]>"
 Check if the tx_isolation is "READ-COMITTED" and if binlog_format is "ROW".
 ```mysql
 SELECT @@global.tx_isolation;
+```
+you should see a table with the text "READ-COMMITTED".  
+```mysql
 SELECT @@global.binlog_format;
 ```
+now you should see the "ROW".  
+
 If everything looks good, we can continue. 
 Insert this to create a database called nextcloud. Replace all three x_ variables with your data.
 ```mysql
@@ -135,26 +144,28 @@ You should see 3 times a "Query OK" line and a "Bye" at the end.
 Download Nextcloud
 ```bash
 wget https://download.nextcloud.com/server/releases/latest.tar.bz2
+wget https://download.nextcloud.com/server/releases/latest.tar.bz2.sha256
 wget https://download.nextcloud.com/server/releases/latest.tar.bz2.asc
-wget https://download.nextcloud.com/server/releases/latest.tar.bz2.md5
-wget https://nextcloud.com/nextcloud.asc
-gpg --import nextcloud.asc
+
+
 ```
 verify
 ```bash
-md5sum -c latest.tar.bz2.md5 < latest.tar.bz2
+sha256sum -c --ignore-missing latest.tar.bz2.sha256 
 ```
-and
+should show ok.
 ```bash
 gpg --verify latest.tar.bz2.asc latest.tar.bz2
 ```
+should say "gpg: Good signature from "Nextcloud Security <security@nextcloud.com>" [unknown]"  
+
 extract and move to the webroot. Change ownership and delete install files
 ```bash
 tar -xjvf latest.tar.bz2
 sudo cp -r nextcloud /var/www
 sudo chown -R www-data:www-data /var/www/nextcloud
 rm -r nextcloud
-rm  latest.tar.bz2 latest.tar.bz2.asc  latest.tar.bz2.md5  nextcloud.asc
+rm  latest.tar.bz2 latest.tar.bz2.asc  latest.tar.bz2.sha256
 ```
 ## PHP settings
 

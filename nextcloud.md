@@ -1,4 +1,4 @@
-# Example installation on Ubuntu 22.04.03 LTS with Apache2, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
+# Example installation on Ubuntu 24.04.01 LTS with Apache2, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.
@@ -13,6 +13,7 @@ This is the structure of the setup used in this guide.
 
 If you want to host Nextcloud in your home and want to access it remotely or even share some files externally, there are some network requirements. 
 You need a real, public routable, none Carrier-grade NAT (CG-NAT) IPv4 address. 
+Don't know what CG-NAT is? [Test if you have a CG-NAT IPv4](https://github.com/jameskimmel/network-stuff/blob/main/CG-NAT.md).  
 If you don't have a real IPv4 address, you could ask your ISP to give you one. Some ISPs will give you one for free, others charge you 5$ a month. Some call it "Gaming IP" or "NAS IP". You could also use IPv6 or a VPN instead. If you want to share files externally, only having IPv6 isn't great, since you don't know if all external users are able to use IPv6.  
 You also need split DNS described in the next paragraph.
 
@@ -33,11 +34,12 @@ sudo dpkg-reconfigure unattended-upgrades
 ```
 
 ## Install packages
-Different versions of Ubuntu may have differing versions of PHP, for example Ubuntu 22.04 ships PHP 8.1, which is not the currently recommended version by Nextcloud. Nextcloud currently recommends PHP 8.2. Adding optional repositories to apt's sources (e.g. Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) or [dpa for Debian](https://packages.sury.org/php/)) is beyond the scope of this tutorial, and will require modifying the name of libapache2-mod-php and all php modules to include the specific version number, e.g. libapache2-mod-php8.2 php8.2-apcu php8.2-bcmat and so on.I think it is simpler to use the Ubuntu PHP version, but adding a PPA is also not that hard. The choice is yours :)
-In this tutorial we will use the included PHP packages from Ubuntu. While 8.1 is not recommended, it is still currently supported by Nextcloud. 
+Different versions of Ubuntu may have differing versions of PHP, for example Ubuntu 24.04 ships PHP 8.3.6, which is by pure luck the currently recommended version by Nextcloud. If the PHP version does not match, you can add other repositories. Adding  repositories to apt's sources (e.g. Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) or [dpa for Debian](https://packages.sury.org/php/)) is beyond the scope of this tutorial.  
+I think it is simpler to use the Ubuntu PHP version, but adding a PPA is also not that hard. The choice is yours :)
 For up to date system requirements, please visit [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html)  
-We install all the software that is needed plus some optional software so we won't get warnings in the Nextcloud Admin Center.
 
+We install all the software that is needed plus some optional software that is needed so we won't get warnings in the Nextcloud Admin Center.  
+Ubuntu 24.04.01 comes with MariaDB 10.11.8 which is currently the recommended version. 
 ```bash
 sudo apt install apache2 \
   bzip2 \
@@ -47,25 +49,42 @@ sudo apt install apache2 \
   redis-server
 ```
 
-Install all php modules.
+Install required php modules.
 ```bash
-sudo apt install libapache2-mod-php \
-  php-apcu \
-  php-bcmath \
-  php-bz2 \
-  php-ctype \
+sudo apt install php-common \
   php-curl \
-  php-dom \
-  php-gd \
-  php-gmp \
-  php-imagick \
-  php-intl \
-  php-mbstring \
-  php-mysql \
-  php-posix \
-  php-redis \
   php-xml \
+  php-gd \
+  php-imagick \
+  php-mbstring \
   php-zip
+```
+
+install DB connector
+```bash
+sudo apt install php-mysql
+```
+
+install recommended modules
+```bash
+sudo apt install php-intl
+```
+
+install performance modules
+```bash
+sudo apt install php-apcu \
+  php-redis 
+```
+optionally you could install these for passwordless logins:
+```bash
+sudo apt install php-bcmath \
+  php-gmp 
+```
+
+optionally you could install these for preview generation:
+```bash
+sudo apt install ffmpeg \
+  libreoffice 
 ```
 ## MariaDB
 
@@ -100,8 +119,13 @@ You should now see "MariaDB [(none)]>"
 Check if the tx_isolation is "READ-COMITTED" and if binlog_format is "ROW".
 ```mysql
 SELECT @@global.tx_isolation;
+```
+you should see a table with the text "READ-COMMITTED".  
+```mysql
 SELECT @@global.binlog_format;
 ```
+now you should see the "ROW".  
+
 If everything looks good, we can continue. 
 Insert this to create a database called nextcloud. Replace all three x_ variables with your data.
 ```mysql
@@ -111,38 +135,141 @@ GRANT ALL PRIVILEGES ON nextcloud.* TO 'x_database_user'@'localhost';
 FLUSH PRIVILEGES;
 exit;
 ```
-You should see 3 times a "Query OK" line and a "Bye" at the end.
+You should see 4 times a "Query OK" line and a "Bye" at the end.
 
 ## Nextcloud
 Download Nextcloud
 ```bash
 wget https://download.nextcloud.com/server/releases/latest.tar.bz2
-wget https://download.nextcloud.com/server/releases/latest.tar.bz2.asc
-wget https://download.nextcloud.com/server/releases/latest.tar.bz2.md5
-wget https://nextcloud.com/nextcloud.asc
-gpg --import nextcloud.asc
+wget https://download.nextcloud.com/server/releases/latest.tar.bz2.sha256
 ```
+
 verify
 ```bash
-md5sum -c latest.tar.bz2.md5 < latest.tar.bz2
+sha256sum -c --ignore-missing latest.tar.bz2.sha256 
 ```
-and
-```bash
-gpg --verify latest.tar.bz2.asc latest.tar.bz2
-```
-extract and move to the webroot. Change ownership and delete install files
+should show ok.  
+
+Extract and move to the webroot. Change ownership and delete install files
 ```bash
 tar -xjvf latest.tar.bz2
-sudo cp -r nextcloud /var/www
+sudo mv nextcloud /var/www
 sudo chown -R www-data:www-data /var/www/nextcloud
-rm -r nextcloud
-rm  latest.tar.bz2 latest.tar.bz2.asc  latest.tar.bz2.md5  nextcloud.asc
+rm  latest.tar.bz2 latest.tar.bz2.sha256
 ```
-## PHP settings
 
-We wanna change the PHP memory limit and upload filesize. Replace 8.1 if you have a newer version of PHP.
+## PHP FPM
+
+We stop apache, install FPM and enable the modules. Replace 8.3 with newer version if needed.
 ```bash
-sudo nano /etc/php/8.1/apache2/php.ini
+sudo systemctl stop apache2
+sudo apt install php-fpm
+sudo apt install libapache2-mod-fcgid
+sudo a2enmod proxy_fcgi setenvif
+sudo a2enconf php8.3-fpm
+```
+Test the config
+```bash
+sudo apachectl configtest
+```
+Should show you a warning we can ignore for now and "Syntak OK".  
+
+restart apache
+```bash
+sudo systemctl restart apache2
+```
+
+In the next steps, we enable MPM event, based on this guide:
+https://www.digitalocean.com/community/tutorials/how-to-configure-apache-http-with-mpm-event-and-php-fpm-on-ubuntu-18-04 
+
+```bash
+sudo systemctl stop apache2
+```
+```bash
+sudo a2dismod php8.3
+```
+should not exist
+
+```bash
+sudo a2dismod mpm_prefork
+```
+should already be disabled
+
+```bash
+sudo a2enmod mpm_event
+```
+should be enabled already
+
+```bash
+sudo apt install libapache2-mod-fcgid
+```
+should be installed already
+
+```bash
+sudo a2enconf php8.3-fpm
+```
+should be enabled already
+
+```bash
+sudo a2enmod proxy
+```
+should be enabled already
+
+```bash
+sudo a2enmod proxy_fcgi
+```
+should be enabled already
+
+Test the config
+```bash
+sudo apachectl configtest
+```
+Should show you"Syntak OK". If you get a warning about the hostname, you 
+can set the hostname by running this:
+```bash
+sudo hostnamectl set-hostname cloud.x_youdomain.com
+```
+restart apache
+```bash
+sudo systemctl restart apache2
+```
+
+check your config. 
+```bash
+sudo apachectl -M | grep 'mpm'
+```
+should output 
+```bash
+Output
+mpm_event_module (shared)
+```
+and 
+```bash
+sudo apachectl -M | grep 'proxy'
+```
+should output 
+```bash
+Output
+proxy_module (shared)
+proxy_fcgi_module (shared)
+```
+
+It is now time to check if PHP is using the FastCGI Process Manager. To do so you’ll create a small PHP file that will show you all the information related to PHP.
+
+```bash
+sudo nano /var/www/html/info.php
+```
+insert this and save and exit
+```bash
+<?php phpinfo(); ?>
+```
+
+visit in your browser http://x_nextcloud_host_IPv4/phpinfo.php and you should see Server API FPM/FastCGI in the fourth line.
+
+## PHP settings
+We wanna change the PHP memory limit and upload filesize. Replace 8.3 if you have a newer version of PHP.
+```bash
+sudo nano /etc/php/8.3/fpm/php.ini
 ```
 
 We search for these settings to change (use ctrl+W to search in nano).
@@ -150,55 +277,61 @@ We search for these settings to change (use ctrl+W to search in nano).
 memory_limit = 1G
 upload_max_filesize = 50G
 post_max_size = 0
-max_execution_time = 3600
+max_execution_time = 300
 date.timezone = Europe/Amsterdam
 opcache.interned_strings_buffer=16
 ```
-Save and exit. Reload apache2
-  
-```bash
-sudo systemctl reload apache2.service
-```
-create a PHP file so we can check the changes
-```bash
-sudo nano /var/www/html/phpinfo.php
-```
-and insert
 
-```PHP
-<?php phpinfo(); ?>
+Save and exit. Reload FPM
+```bash
+sudo systemctl reload php8.3-fpm.service 
+```
+after reloading the webpage, you should see the changes in info.php.
+
+PHP-FPM default values are to low. Find appropiate values with this tool https://spot13.com/pmcalculator/. 
+For me this is this:
+pm.max_children = 201
+pm.start_servers = 50
+pm.min_spare_servers = 50
+pm.max_spare_servers = 50
+
+and insert them here
+```bash
+sudo nano /etc/php/8.3/fpm/pool.d/www.conf
 ```
 
-Now can see the default Apache2 page at 
-http://x_nextcloud_host_IPv4.
-To see the PHP settings go to 
-http://x_nextcloud_host_IPv4/phpinfo.php
-You should find the values we defined. 
-To disable that page and delete the html folder, run 
+in the same file, uncomment these environment variables:
 ```bash
-sudo a2dissite 000-default.conf
-sudo systemctl reload apache2
-sudo rm -r /var/www/html
+;env[HOSTNAME] = $HOSTNAME
+;env[PATH] = /usr/local/bin:/usr/bin:/bin
+;env[TMP] = /tmp
+;env[TMPDIR] = /tmp
+;env[TEMP] = /tmp
 ```
+You should see these changes on the webpage after you restart FPM
+```bash
+sudo systemctl reload php8.3-fpm.service 
+```
+
 ## Apache2
 Create the data folder. You can also use a different location.
 Just make sure to replace /var/www/nextcloud/data everywhere with your data path. 
 ```bash
-sudo mkdir /var/www/nextcloud/data
-sudo chown -R www-data:www-data /var/www/nextcloud/data
+sudo -u www-data mkdir /var/www/nextcloud/data
 ```
 
 Configure Apache2
 ```bash
 sudo nano /etc/apache2/sites-available/nextcloud.conf
 ```
-insert:
+insert and change the x variable:
 ```bash
 <VirtualHost *:80>
   DocumentRoot /var/www/nextcloud/
   ServerName  cloud.x_youromain.com
 
   <Directory /var/www/nextcloud/>
+    Satisfy Any
     Require all granted
     AllowOverride All
     Options FollowSymLinks MultiViews
@@ -218,11 +351,25 @@ sudo a2enmod headers
 sudo a2enmod env
 sudo a2enmod dir
 sudo a2enmod mime
-sudo service apache2 restart
+sudo a2enmod setenvif
+sudo systemctl restart apache2
+```
+
+We disable the default page and delete the default folder.
+```bash
+sudo a2dissite 000-default.conf
+sudo systemctl reload apache2
+sudo rm -r /var/www/html
+```
+
+Test the config
+```bash
+sudo apachectl configtest
 ```
 
 ## Cerbot
-This guide assumes you have Certbot installed. If you dont have it installed yet, here is the currently recommended way to do it:
+This guide assumes you have Certbot installed. If you dont have it installed yet, 
+Certbot currently recommends installing by using snap.
 ```bash
 sudo apt install snapd
 sudo snap install --classic certbot
@@ -232,27 +379,27 @@ sudo ln -s /snap/bin/certbot /usr/bin/certbot
 For certbot to be sucessfull, you need an A or AAAA record that points to your instance with the open port 80.
 
 ```bash
-sudo certbot
+sudo certbot --apache
 ```
-Follow the certbot instructions.
-If you have done everything right, it should automatically detect hostnames from the Apache2 configs. 
-If you are unable to get a cert, most of the time there is something wrong with your firewall opening the port 80 or your DNS settings.
-Certbot will create a cert and also change your config to redirect all traffic to https.
+Follow the certbot instructions. When asked if http should be redirected or not, use 2 to enable redirection.
+If you have done everything right, it should automatically detect your hostname from the Apache2 config. 
+If you are unable to get a cert, most of the time there is something wrong with your firewall or DNS settings. From the outside, cloud.yourdomain.com should point to the IP of 
+your nextcloud host. For IPv6 you need a firewall rule to allow traffic on port 80 to your nextcloud host. For IPv4, you need to NAT incoming Port 80 traffic to your nextcloud host.
+I can recommend you dnschecker.org, since you can input your domain name and the port 80 there. Port should be open.
+
 To test if the automatic removal is working run
 ```bash
 sudo certbot renew --dry-run
 ```
 
-## Enable SSL
-```bash
-sudo a2enmod ssl
-sudo a2ensite default-ssl
-sudo service apache2 reload
-```
-
 ## Install Nextcloud 
-You can install Nextcloud with that command or by using the WebPage.
+You can install Nextcloud via the webGUI over IP, over the domain name or in the console. 
+I would recommend you using your domain name. That way you can save some work and test if your DNS is working.
+On the webGUI you can define a admin username and password. 
+We insert x_database_user and x_database_password and also the database name "nextcloud".
+Host we can leave at "localhost". Then click on install.
 
+If you wan't to use CLI, use these commands:
 ```bash
 cd /var/www/nextcloud/
 sudo -u www-data php occ  maintenance:install \
@@ -262,9 +409,13 @@ sudo -u www-data php occ  maintenance:install \
 --data-dir='/var/www/nextcloud/data'
 ```
 
-If we navigate now to https://cloud.x_youromain.com, we should see a warning that try to connect over an untrusted domain. 
+Congrats, we now have a working Nextcloud instance! 
+Depending on which you maybe now see a trusted domains error. That is fine.
+Now it needs security tweaks and some fine tuning!
 
 ## PHP config settings
+Depending if you used the CLI or webpage, some values maybe already correct.
+
 Edit config.php file. 
 ```bash
 sudo nano /var/www/nextcloud/config/config.php
@@ -276,20 +427,26 @@ Set the trusted_domains array
     0 => 'cloud.x_youromain.com',
   ),
 ```
+
+we also change the overrides:
+```bash
+  'overwrite.cli.url' => 'https://cloud.x_youromain.com',
+```
+
 while we are at it, you could also add these settings to match your locales:
 ```bash
-'default_language' => 'de',
-'default_locale' => 'de_DE',
-'default_phone_region' => 'DE',
+  'default_language' => 'de',
+  'default_locale' => 'de_DE',
+  'default_phone_region' => 'DE',
 ```
 save and exit
 
 update the settings by
 ```bash
-cd /var/www/nextcloud/
-sudo -u www-data php occ maintenance:update:htaccess
+sudo -u www-data php /var/www/nextcloud/occ maintenance:update:htaccess
 ```
-Now you should be able to access cloud.x_youromain.com without untrusted domain warning. If the warning is still there, try to access it over your mobile networt to rule out an error in your local DNS settings. 
+Now you should be able to access cloud.x_youromain.com without untrusted domain warning. 
+If the warning is still there, try to access it over your mobile to rule out an error in your local DNS settings. 
 
 ## Set up crontab
 We wanna use crontab instead of AJAX.
@@ -328,7 +485,7 @@ sudo nano /etc/redis/redis.conf
 ```
 uncomment 
 unixsocket /run/redis/redis-server.sock
-Set 
+also uncomment and set 
 unixsocketperm to 770
 Exit and save.
 Restart redis
@@ -339,7 +496,8 @@ Check output of redis
 ```bash
 ls -lh /var/run/redis
 ```
-Change nextcloud PHP config. While we are in this file, we also add the memcache.local for APCu.
+Change nextcloud PHP config. 
+While we are in this file, we also add the memcache.local for APCu.
 
 ```bash
 sudo nano /var/www/nextcloud/config/config.php
@@ -348,18 +506,16 @@ Add:
 ```PHP
   'memcache.local' => '\OC\Memcache\APCu',
   'memcache.locking' => '\OC\Memcache\Redis',
-  'redis' => array(
-     'host' => 'localhost',
-     'port' => 6379,
-     'timeout' => 1,
-     'password' => '',  
-      ),
+  'redis' => [
+   'host'     => '/run/redis/redis-server.sock',
+   'port'     => 0,
+],
 ```
 
 ### APCu
 Change apcu.ini. Watch out for the PHP version
 ```bash
-sudo nano /etc/php/8.1/apache2/conf.d/20-apcu.ini
+sudo nano /etc/php/8.3/fpm/conf.d/20-apcu.ini 
 ```
 Change it to: 
 ```config
@@ -367,9 +523,9 @@ extension=apcu.so
 apc.enabled=1
 apc.enable_cli=1
 ```
-To start APCu automatically use this command and replace the PHP version 8.1 if needed
+To start APCu automatically use this command and replace the PHP version 8.3 if needed
 ```bash
-sudo -u www-data php8.1 --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
+sudo -u www-data php --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
 ```
 
 Check if Opcache is working
@@ -390,16 +546,17 @@ We set the strict transport security.
 ```bash
 sudo nano /etc/apache2/sites-available/nextcloud-le-ssl.conf
 ```
-Insert the IfModule.
+Insert the IfModule mod_headers.
 Your setting should look like this:
 
 ```bash
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
   DocumentRoot /var/www/nextcloud/
-  ServerName  cloud.yourdomain.com
+  ServerName  cloud.x_yourdomain.com
 
   <Directory /var/www/nextcloud/>
+    Satisfy Any
     Require all granted
     AllowOverride All
     Options FollowSymLinks MultiViews
@@ -411,7 +568,6 @@ Your setting should look like this:
     <IfModule mod_headers.c>
       Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
     </IfModule>
-
   </Directory>
 
 SSLCertificateFile /etc/letsencrypt/live/cloud.yourdomain.com/fullchain.pem
@@ -430,19 +586,29 @@ If you decided against HSTS, ditch the "preload" in the IfModule on use it like 
 ```
 
 ### Pretty URLs 
-Pretty URLs remove the index.php-part in all Nextcloud URLs, for example in sharing links like https://example.org/nextcloud/index.php/s/Sv1b7krAUqmF8QQ, making URLs shorter and thus prettier.
+Pretty URLs remove the index.php-part in all Nextcloud URLs, for example in sharing links like https://cloud.yourdomain.com/index.php/s/Sv1b7krAUqmF8QQ, making URLs shorter and thus prettier.
 
 ```bash
 sudo nano /var/www/nextcloud/config/config.php
-'overwrite.cli.url' => 'https://example.org/',
-'htaccess.RewriteBase' => '/',
+```
+```php
+  'htaccess.RewriteBase' => '/',
+```
+save and exit.
+update htaccess
+```bash
 sudo -u www-data php /var/www/nextcloud/occ maintenance:update:htaccess
 ```
 ### maintenance window
 We can define when a the maintenance window starts (UTC time!). By default, the maintenance windows ends 4 hours after the start. 
-We start it at 3 in the morning.
+We start it at 1 in the morning.
 ```bash
 sudo -u www-data php /var/www/nextcloud/occ config:system:set maintenance_window_start --type=integer --value=1
+```
+### mimetype and indizes
+```bash
+sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
+sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
 ```
 
 Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com!
@@ -467,6 +633,7 @@ To speed it up, create a temp backup and update dir.
 ```bash
 sudo mkdir /var/www/update
 sudo chown www-data:www-data /var/www/update/
+to do
 sudo nano /var/www/nextcloud/config/config.php
 ```
 add the line
