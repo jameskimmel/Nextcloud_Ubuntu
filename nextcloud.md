@@ -1,8 +1,8 @@
-# Example installation on Ubuntu 24.04.01 LTS with Apache2, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
+# Example installation on Ubuntu 24.04.01 LTS with Apache2, PHP FPM, APCu, redis, and MariaDB, no Docker, no Snap
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.
-The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to jump from one topic to another and have to read up on multiple things. This guide should offer you a more streamlined experience.
+The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to jump from one topic to another and have to read up on multiple things. This guide hopefully offers you a more streamlined experience.
 
 There are some placeholder values or variables that always start with x_. You need to replace them with your data. 
 This is the structure of the setup used in this guide.
@@ -25,6 +25,12 @@ Then traffic will go to your firewall and some kind of NAT will redirect it to y
 But if you are on your local network, that probably will not work, because your firewall only NATs from WAN to LAN and not LAN to LAN. 
 The easiest way to solve this is to use split DNS. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it should answer it with 192.168.1.10. This is done by unbound overrides. Most home routers don't offer unbound, so you may need to look into setting up a pi-hole DNS server.  
 Another option that should work (but I have not looked into it!) is Hairpin NAT.
+
+### Optional: HTTP Strict Transport Security (HSTS)
+This  is optional.
+You can preload HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
+That way you gain security by forcing all your domains and subdomains to use HTTPS. 
+To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
 
 ## Getting ready
 ```bash
@@ -346,12 +352,7 @@ insert and change the x variable:
 Enable site and mods:
 ```bash
 sudo a2ensite nextcloud.conf
-sudo a2enmod rewrite
-sudo a2enmod headers
-sudo a2enmod env
-sudo a2enmod dir
-sudo a2enmod mime
-sudo a2enmod setenvif
+sudo a2enmod rewrite headers env dir mime setenvif
 sudo systemctl restart apache2
 ```
 
@@ -381,8 +382,9 @@ For certbot to be sucessfull, you need an A or AAAA record that points to your i
 ```bash
 sudo certbot --apache
 ```
-Follow the certbot instructions. When asked if http should be redirected or not, use 2 to enable redirection.
+Follow the certbot instructions. When asked if http should be redirected or not, say yes.
 If you have done everything right, it should automatically detect your hostname from the Apache2 config. 
+
 If you are unable to get a cert, most of the time there is something wrong with your firewall or DNS settings. From the outside, cloud.yourdomain.com should point to the IP of 
 your nextcloud host. For IPv6 you need a firewall rule to allow traffic on port 80 to your nextcloud host. For IPv4, you need to NAT incoming Port 80 traffic to your nextcloud host.
 I can recommend you dnschecker.org, since you can input your domain name and the port 80 there. Port should be open.
@@ -533,13 +535,6 @@ Check if Opcache is working
 php -r 'phpinfo();' | grep opcache.enable
 ```
 
-## HTTP Strict Transport Security (HSTS)
-This step is optional.
-You can preload HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
-That way you gain security by forcing all your domains and subdomains to use HTTPS. 
-To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
-If you don't want to use this, you need to make a small change in Apache and NGINX by removing "preload". 
-
 ## Configure Apache2 HSTS
 We set the strict transport security. 
 
@@ -599,12 +594,14 @@ update htaccess
 ```bash
 sudo -u www-data php /var/www/nextcloud/occ maintenance:update:htaccess
 ```
+
 ### maintenance window
 We can define when a the maintenance window starts (UTC time!). By default, the maintenance windows ends 4 hours after the start. 
 We start it at 1 in the morning.
 ```bash
 sudo -u www-data php /var/www/nextcloud/occ config:system:set maintenance_window_start --type=integer --value=1
 ```
+
 ### mimetype and indizes
 ```bash
 sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
