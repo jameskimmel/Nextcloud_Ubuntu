@@ -640,10 +640,11 @@ Add:
 ```PHP
   'memcache.local' => '\OC\Memcache\APCu',
   'memcache.locking' => '\OC\Memcache\Redis',
-  'redis' => [
+  'redis' =>
+  array (
    'host'     => '/run/redis/redis-server.sock',
    'port'     => 0,
-  ],
+  ),
 ```
 
 ### APCu
