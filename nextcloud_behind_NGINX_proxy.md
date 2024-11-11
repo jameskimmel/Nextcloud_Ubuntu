@@ -426,7 +426,7 @@ sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
 ```
 At the time of writing this, there is still an open issue for certbot 
 (https://github.com/certbot/certbot/issues/3646). 
-That is why we add the line "http2 on".
+That is why we add the line "http2 on". You also need to change change the proxy pass IP line and all the cloud.x_youromain.com variables. 
 ```NGINX
 server {
     server_name cloud.x_youromain.com;
