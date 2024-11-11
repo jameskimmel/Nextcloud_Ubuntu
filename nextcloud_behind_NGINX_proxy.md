@@ -1,7 +1,5 @@
 # Example installation on Ubuntu 24.04.01 LTS with Apache2,PHP FPM, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
 
-Do not use! Under construciton and untested!
-
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.
 The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to jump from one topic to another and have to read up on multiple things. This guide hopefully offers you a more streamlined experience.
@@ -426,23 +424,21 @@ sudo certbot renew --dry-run
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
 ```
-At the time of writing this, there is still an open issue for certbot (https://github.com/certbot/certbot/issues/3646). 
-To not get any warnings from NGINX, add 'http2' in the two ssl listen lines.
+At the time of writing this, there is still an open issue for certbot 
+(https://github.com/certbot/certbot/issues/3646). 
+That is why we add the line "http2 on".
 ```NGINX
 server {
     server_name cloud.x_youromain.com;
 
-
-    listen [::]:443 ssl http2 ipv6only=on; # managed by Certbot
-    listen 443 ssl http2; # managed by Certbot
+    listen [::]:443 ssl; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    http2  on;
     ssl_certificate /etc/letsencrypt/live/cloud.x_youromain.com/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/cloud.x_youromain.com/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
-    # security headers
-#    add_header X-Content-Type-Options    "nosniff" always;
-#    add_header X-Robots-Tag              "noindex, nofollow" always;
     add_header Referrer-Policy           "no-referrer" always;
     add_header Content-Security-Policy   "default-src 'self' http: https: ws: wss: data: blob: 'unsafe-inline'; frame-ancestors 'self';" always;
     add_header Permissions-Policy        "interest-cohort=()" always;
@@ -512,10 +508,11 @@ sudo nginx -t
 sudo nginx -s reload
 ```
 
-
 ## Install Nextcloud 
 You can install Nextcloud via the webGUI over IP, over the domain name or in the console. 
 I would recommend you using your domain name. That way you can save some work and test if your DNS is working.
+Even better, use your real domain name over a hotspot. That way you see if you can really access cloud.yourdomain.com.
+
 On the webGUI you can define a admin username and password. 
 We insert x_database_user and x_database_password and also the database name "nextcloud".
 Host we can leave at "localhost". Then click on install.
@@ -531,8 +528,8 @@ sudo -u www-data php occ  maintenance:install \
 ```
 
 Congrats, we now have a working Nextcloud instance! 
-If we navigate now to https://cloud.x_youromain.com, we should see a warning that we are not trusted, because we have not set up the proxy configs yet.
-
+Don't worry if you see a warning about an untrusted domain or IP. 
+We solve that in the next step. 
 
 ## PHP config settings
 Depending if you used the CLI or webpage, some values maybe already correct.
@@ -541,7 +538,7 @@ Edit config.php file.
 ```bash
 sudo nano /var/www/nextcloud/config/config.php
 ```
-Set the trusted_domains array
+If not already done, set the trusted_domains array
 ```bash
   'trusted_domains' =>
   array (
@@ -551,10 +548,11 @@ Set the trusted_domains array
 
 Set the IP of our trusted NGINX proxy
 ```bash
-'trusted_proxies' =>
+  'trusted_proxies' =>
   array (
     0 => 'x_NGINX_IPv4',
-),
+  ),
+  ```
 
 we also change the overrides:
 ```bash
@@ -570,10 +568,9 @@ while we are at it, you could also add these settings to match your locales:
 
 we also need some settings because of our proxy
 ```bash
-'overwriteprotocol' => 'https',
-'overwritewebroot' => '/',
-'overwritecondaddr' => 'x_NGINX_IPv4',
-'htaccess.RewriteBase' => '/',
+  'overwriteprotocol' => 'https',
+  'overwritewebroot' => '/',
+  'overwritecondaddr' => 'x_NGINX_IPv4',
 ```
 save and exit
 
@@ -646,7 +643,7 @@ Add:
   'redis' => [
    'host'     => '/run/redis/redis-server.sock',
    'port'     => 0,
-],
+  ],
 ```
 
 ### APCu
@@ -665,13 +662,9 @@ To start APCu automatically use this command and replace the PHP version 8.3 if 
 sudo -u www-data php --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
 ```
 
-Check if Opcache is working
-```bash
-php -r 'phpinfo();' | grep opcache.enable
-```
-
 ## Configure Apache2 HSTS
-Probably only cosmetics, because it is already done by the proxy. Anyway setting this will remove the warning in the admin center.
+Probably only cosmetics, because it is already done by the proxy. 
+Anyway setting this will remove the warning in the admin center.
 ```bash
 sudo nano /etc/apache2/sites-available/nextcloud.conf
 ```
@@ -695,6 +688,7 @@ insert mod_headers.c
     <IfModule mod_headers.c>
       Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
     </IfModule>
+
   </Directory>
 </VirtualHost>
 ```
@@ -707,7 +701,7 @@ If you decided against HSTS, ditch the "preload" in the IfModule on use it like 
       Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
 ```
 
-### Pretty URLs ??? 
+### Pretty URLs
 Pretty URLs remove the index.php-part in all Nextcloud URLs, for example in sharing links like https://cloud.yourdomain.com/index.php/s/Sv1b7krAUqmF8QQ, making URLs shorter and thus prettier.
 
 ```bash
@@ -723,7 +717,7 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:update:htaccess
 ```
 
 ### maintenance window
-We can define when a the maintenance window starts (UTC time!). By default, the maintenance windows ends 4 hours after the start. 
+We can define when a the maintenance window starts (UTC time). By default, the maintenance windows ends 4 hours after the start. 
 We start it at 3 in the morning.
 ```bash
 sudo -u www-data php /var/www/nextcloud/occ config:system:set maintenance_window_start --type=integer --value=1
@@ -735,7 +729,8 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensi
 sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
 ```
 
-Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com. 
+Congrats! You should no have no warnings in the admin center and a perfect score 
+on scan.nextcloud.com. 
 
 ### NFS share as data directory (optional)
 Instead of using local storage, you can move the data directory to a NFS mount. 
