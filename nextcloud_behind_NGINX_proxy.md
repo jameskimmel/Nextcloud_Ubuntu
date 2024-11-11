@@ -751,11 +751,10 @@ add the line
 Updates can take a long time if your data directory is on a NFS share, because Nextcloud will create a backup first. 
 To speed it up, create a temp backup and update dir.
 ```bash
-sudo mkdir /var/www/update
-sudo chown www-data:www-data /var/www/update/
+sudo -u www-data mkdir /tmp/nextcloudUpdateDir
 sudo nano /var/www/nextcloud/config/config.php
 ```
 add the line
 ```bash
-'updatedirectory' => '/var/www/update',
+  'updatedirectory' => '/tmp/nextcloudUpdateDir',
 ```
