@@ -178,7 +178,7 @@ Test the config
 ```bash
 sudo apachectl configtest
 ```
-Should show you a warning we can ignore for now and "Syntak OK".  
+Should show you a warning we can ignore for now and "Syntax OK".  
 
 restart apache
 ```bash
@@ -235,6 +235,8 @@ can set the hostname by running this:
 ```bash
 sudo hostnamectl set-hostname cloud.x_youdomain.com
 ```
+if you run the test again, the warning should disapper.
+
 restart apache
 ```bash
 sudo systemctl restart apache2
