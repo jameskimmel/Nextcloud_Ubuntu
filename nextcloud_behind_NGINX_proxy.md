@@ -724,7 +724,7 @@ We start it at 3 in the morning.
 sudo -u www-data php /var/www/nextcloud/occ config:system:set maintenance_window_start --type=integer --value=1
 ```
 
-### mimetype and indizes???
+### mimetype and indizes
 ```bash
 sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
 sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
