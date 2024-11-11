@@ -91,7 +91,7 @@ sudo apt install php-bcmath \
   php-gmp 
 ```
 
-optionally you could install these for preview generation:
+optionally you could install ffmpeg (videos) and LibreOffice (Word, Excel, PowerPoint) for preview generation. Beware, these are pretty big.
 ```bash
 sudo apt install ffmpeg \
   libreoffice 
