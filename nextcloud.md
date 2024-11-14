@@ -370,7 +370,7 @@ Test the config
 sudo apachectl configtest
 ```
 
-## Cerbot
+## Certbot
 This guide assumes you have Certbot installed. If you dont have it installed yet, 
 Certbot currently recommends installing by using snap.
 ```bash
