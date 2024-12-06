@@ -748,13 +748,14 @@ add the line
 'datadirectory' => '/mnt/nextcloud/data',
 ```
 ### temp path for Update (optional)
-Updates can take a long time if your data directory is on a NFS share, because Nextcloud will create a backup first. 
-To speed it up, create a temp backup and update dir.
+Updates can take a long time if your data directory is on a NFS share. 
+To speed it up, create an update directory that is on your local SSD instead. 
 ```bash
-sudo -u www-data mkdir /tmp/nextcloudUpdateDir
+sudo mkdir /var/www/updateDirNextcloud
+sudo chown www-data:www-data /var/www/updateDirNextcloud
 sudo nano /var/www/nextcloud/config/config.php
 ```
 add the line
 ```bash
-  'updatedirectory' => '/tmp/nextcloudUpdateDir',
+  'updatedirectory' => '/var/www/updateDirNextcloud',
 ```
