@@ -375,7 +375,8 @@ sudo apachectl configtest
 ```
 
 ## NGINX settings on the reverse Proxy
-My NGIXN settings are based on this cool tool: do.co/nginxconfig
+My NGIXN settings are based on this cool tool by DigitalOcean:
+[NGINXConfig](https://www.digitalocean.com/community/tools/nginx?domains.0.server.domain=cloud.mydomain.com&domains.0.server.redirectSubdomains=false&domains.0.https.hstsPreload=true&domains.0.php.php=false&domains.0.reverseProxy.reverseProxy=true&domains.0.reverseProxy.proxyPass=http%3A%2F%2F10.0.56.2%2F&domains.0.routing.root=false&global.https.sslProfile=modern&global.https.ocspCloudflareType=both&global.https.ocspGoogleType=both&global.https.ocspOpenDnsType=both&global.https.ocspQuad9=true&global.https.ocspQuad9Type=both&global.https.ocspVerisign=true&global.https.ocspVerisignType=both&global.security.referrerPolicy=no-referrer&global.reverseProxy.proxyConnectTimeout=600&global.reverseProxy.proxySendTimeout=600&global.reverseProxy.proxyReadTimeout=600&global.performance.gzipCompression=false&global.performance.assetsExpiration=&global.performance.mediaExpiration=&global.performance.svgExpiration=&global.performance.fontsExpiration=&global.nginx.clientMaxBodySize=50000&global.app.lang=de)
 
 First we create an emtpy site without ssl.
 ```bash
