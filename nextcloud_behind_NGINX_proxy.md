@@ -291,7 +291,8 @@ upload_max_filesize = 50G
 post_max_size = 0
 max_execution_time = 300
 date.timezone = Europe/Amsterdam
-opcache.interned_strings_buffer=16
+opcache.memory_consumption=256
+opcache.interned_strings_buffer=32
 ```
 
 Save and exit. Reload FPM
