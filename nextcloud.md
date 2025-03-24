@@ -272,7 +272,7 @@ insert this and save and exit
 <?php phpinfo(); ?>
 ```
 
-visit in your browser http://x_nextcloud_host_IPv4/phpinfo.php and you should see Server API FPM/FastCGI in the fourth line.
+visit in your browser http://x_nextcloud_host_IPv4/info.php and you should see Server API FPM/FastCGI in the fourth line.
 
 ## PHP settings
 We wanna change the PHP memory limit and upload filesize. Replace 8.3 if you have a newer version of PHP.
