@@ -49,7 +49,7 @@ I think it is simpler to use the Ubuntu PHP version, but adding a PPA is also no
 For up to date system requirements, please visit [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html)  
 
 We install all the software that is needed plus some optional software that is needed so we won't get warnings in the Nextcloud Admin Center.  
-Ubuntu 24.04.01 comes with MariaDB 10.11.8 which is currently the recommended version. 
+Ubuntu 24.04 comes with MariaDB 10.11.8 which is currently the recommended version. 
 ```bash
 sudo apt install apache2 \
   bzip2 \
@@ -85,7 +85,7 @@ install performance modules
 sudo apt install php-apcu \
   php-redis 
 ```
-optionally you could install these for passwordless logins:
+install these for passwordless logins and performance:
 ```bash
 sudo apt install php-bcmath \
   php-gmp 
@@ -108,9 +108,9 @@ insert
 transaction_isolation = READ-COMMITTED
 binlog_format = ROW
 ```
-exit and save.
-Reload mariadb
+exit and save (Ctrl + x and Y).
 
+Reload mariadb
 ```bash
 sudo systemctl restart mariadb.service
 ```
@@ -158,7 +158,7 @@ verify
 ```bash
 sha256sum -c --ignore-missing latest.tar.bz2.sha256 
 ```
-should show ok.  
+should show OK.  
 
 Extract and move to the webroot. Change ownership and delete install files
 ```bash
@@ -174,23 +174,27 @@ We stop apache, install FPM and enable the modules. Replace 8.3 with newer versi
 ```bash
 sudo systemctl stop apache2
 sudo apt install php-fpm
-sudo apt install libapache2-mod-fcgid
 sudo a2enmod proxy_fcgi setenvif
 sudo a2enconf php8.3-fpm
 ```
+
+We set the hostname of our server. This should be a FQDN.
+```bash
+sudo hostnamectl set-hostname cloud.x_youdomain.com
+```
+
 Test the config
 ```bash
 sudo apachectl configtest
 ```
-Should show you a warning we can ignore for now and "Syntax OK".  
+You should see "Syntax OK".  
 
 restart apache
 ```bash
 sudo systemctl restart apache2
 ```
 
-In the next steps, we enable MPM event, based on this guide:
-https://www.digitalocean.com/community/tutorials/how-to-configure-apache-http-with-mpm-event-and-php-fpm-on-ubuntu-18-04 
+In the next steps, we enable MPM event.
 
 ```bash
 sudo systemctl stop apache2
@@ -211,11 +215,6 @@ sudo a2enmod mpm_event
 should be enabled already
 
 ```bash
-sudo apt install libapache2-mod-fcgid
-```
-should be installed already
-
-```bash
 sudo a2enconf php8.3-fpm
 ```
 should be enabled already
@@ -234,12 +233,7 @@ Test the config
 ```bash
 sudo apachectl configtest
 ```
-Should show you"Syntak OK". If you get a warning about the hostname, you 
-can set the hostname by running this:
-```bash
-sudo hostnamectl set-hostname cloud.x_youdomain.com
-```
-if you run the test again, the warning should disapper.
+You should "Syntak OK".
 
 restart apache
 ```bash
@@ -276,7 +270,8 @@ insert this and save and exit
 <?php phpinfo(); ?>
 ```
 
-visit in your browser http://x_nextcloud_host_IPv4/phpinfo.php and you should see Server API FPM/FastCGI in the fourth line.
+In your browser, enter the IP of your Nextcloud host (for example http://192.168.1.10) and you should see the Apache2 default page. 
+Add /info.php to the end (http://x_nextcloud_host_IPv4/info.php) and you can see the PHP infos. The fourth line should be "Server API" with "FPM/FastCGI".  
 
 ## PHP settings
 We wanna change the PHP memory limit and upload filesize. Replace 8.3 if you have a newer version of PHP.
@@ -284,7 +279,7 @@ We wanna change the PHP memory limit and upload filesize. Replace 8.3 if you hav
 sudo nano /etc/php/8.3/fpm/php.ini
 ```
 
-We search for these settings to change (use ctrl+W to search in nano).
+We search for these settings to change (use ctrl+W to search in nano). Watch out to delete the ; before the opcache settings, otherwise they are commented out. 
 ```bash
 memory_limit = 1G
 upload_max_filesize = 50G
@@ -327,8 +322,7 @@ sudo systemctl reload php8.3-fpm.service
 ```
 
 ## Apache2
-Create the data folder. You can also use a different location.
-Just make sure to replace /var/www/nextcloud/data everywhere with your data path. 
+Create the nextcloud folder
 ```bash
 sudo -u www-data mkdir /var/www/nextcloud/data
 ```
@@ -376,7 +370,7 @@ sudo apachectl configtest
 ```
 
 ## NGINX settings on the reverse Proxy
-My NGIXN settings are based on this cool tool by DigitalOcean:
+My NGINX settings are based on this cool tool by DigitalOcean:
 [NGINXConfig](https://www.digitalocean.com/community/tools/nginx?domains.0.server.domain=cloud.mydomain.com&domains.0.server.redirectSubdomains=false&domains.0.https.hstsPreload=true&domains.0.php.php=false&domains.0.reverseProxy.reverseProxy=true&domains.0.reverseProxy.proxyPass=http%3A%2F%2F10.0.56.2%2F&domains.0.routing.root=false&global.https.sslProfile=modern&global.https.ocspCloudflareType=both&global.https.ocspGoogleType=both&global.https.ocspOpenDnsType=both&global.https.ocspQuad9=true&global.https.ocspQuad9Type=both&global.https.ocspVerisign=true&global.https.ocspVerisignType=both&global.security.referrerPolicy=no-referrer&global.reverseProxy.proxyConnectTimeout=600&global.reverseProxy.proxySendTimeout=600&global.reverseProxy.proxyReadTimeout=600&global.performance.gzipCompression=false&global.performance.assetsExpiration=&global.performance.mediaExpiration=&global.performance.svgExpiration=&global.performance.fontsExpiration=&global.nginx.clientMaxBodySize=50000&global.app.lang=de)
 
 First we create an emtpy site without ssl.
@@ -392,8 +386,8 @@ server {
 }
 ```
 ```bash
-sudo nginx -t
 sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.conf /etc/nginx/sites-enabled/cloud.x_yourdomain.conf
+sudo nginx -t
 sudo nginx -s reload
 ```
 
@@ -426,9 +420,9 @@ sudo certbot renew --dry-run
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
 ```
-At the time of writing this, there is still an open issue for certbot 
-(https://github.com/certbot/certbot/issues/3646). 
-That is why we add the line "http2 on". You also need to change change the proxy pass IP line and all the cloud.x_youromain.com variables. 
+At the time of writing this, certbot does not add http2 on by default and the DigitalOcean adds it to the wrong place.
+That is why we add the line "http2 on" and configure the listen directives differently. 
+You also need to change change the proxy pass IP line and all the cloud.x_youromain.com variables. In the end, it should look like this:
 ```NGINX
 server {
     server_name cloud.x_youromain.com;
@@ -675,7 +669,7 @@ Anyway setting this will remove the warning in the admin center.
 ```bash
 sudo nano /etc/apache2/sites-available/nextcloud.conf
 ```
-insert mod_headers.c     
+insert the mod_headers.c block
 
 ```bash
 <VirtualHost *:80>
