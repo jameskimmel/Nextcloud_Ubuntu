@@ -1,34 +1,38 @@
 # Example installation on Ubuntu 24.04.01 LTS with Apache2,PHP FPM, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
 
 ## Who is this for?
-This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.
-The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to jump from one topic to another and have to read up on multiple things. This guide hopefully offers you a more streamlined experience.
-
-There are some placeholder values or variables that always start with x_. You need to replace them with your data. 
+This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.  
+The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to jump from one topic to another and have to read up on multiple things. This guide hopefully offers you a more streamlined experience.  
+There are some placeholder values or variables that always start with x_. You need to replace them with your data.  
 This is the structure of the setup used in this guide.
 
 ![setup](https://github.com/jameskimmel/Nextcloud_Ubuntu/assets/17176225/a5aae0e5-6560-4c4f-9a6d-cf062b1fdb8b)
 
 ## Network requirements
 
-If you want to host Nextcloud in your home and want to access it remotely or even share some files externally, there are some network requirements. 
-You need a real, public routable, none Carrier-grade NAT (CG-NAT) IPv4 address. 
-Don't know what CG-NAT is? [Test if you have a CG-NAT IPv4](https://github.com/jameskimmel/network-stuff/blob/main/CG-NAT.md).  
-If you don't have a real IPv4 address, you could ask your ISP to give you one. Some ISPs will give you one for free, others charge you 5$ a month. Some call it "Gaming IP" or "NAS IP". You could also use IPv6 or a VPN instead. If you want to share files externally, only having IPv6 isn't great, since you don't know if all external users are able to use IPv6.  
-You also need split DNS described in the next paragraph. 
+If you want to access Nextcloud remotely and share files with external users, there are some network requirements.  
+You need a real, public routable, none Carrier-grade NAT (CG-NAT) IPv4 address.  
+Don't know what CG-NAT is?  
+[Test if you have a CG-NAT IPv4](https://github.com/jameskimmel/opinions_about_tech_stuff/blob/main/network%20stuff/CG-NAT.md).  
+If you don't have a real IPv4 address, you could try to ask your ISP. Some ISPs will give you one for free, others charge you 5$ a month. Some call it "Gaming IP" or "NAS IP". You can also use IPv6 or a VPN instead. But if you want to share files externally with other users, only having IPv6 isn't great, since you don't know if all external users support IPv6.  
+You also need split DNS described in the next paragraph.  
 
 ### Split DNS or Hairpin NAT
-Why is split DNS or Hairpin NAT even needed? 
-Let's assume your WAN IPv4 is 85.29.10.1 and your NGINX Proxy has the IP 192.168.1.10 and your domain is cloud.yourdomain.com.
-
+What is split DNS and why is it needed for IPv4?  
+Let's assume your WAN IPv4 is 85.29.10.1 and your NGINX Proxy has the IP 192.168.1.10 and your domain is cloud.yourdomain.com.  
 If you are on the road and try to connect to your Nextcloud, your client will ask "Hey, what IP is cloud.yourdomain.com?" a DNS server will answer with "85.29.10.1".
-Then traffic will go to your firewall and some kind of NAT will redirect it to your NGINX Proxy on 192.168.1.10.
-
+Then traffic will go to your firewall and some kind of **NAT** will redirect it to your Nextcloud instance on 192.168.1.10. 
 But if you are on your local network, that probably will not work, because your firewall only NATs from WAN to LAN and not LAN to LAN. 
-The easiest way to solve this is to use split DNS. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it should answer it with 192.168.1.10. This is cane be done by unbound overrides. Most home routers don't offer unbound, so you may need to look into setting up a pi-hole DNS server.
+The easiest way to solve this is to use split DNS. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it should answer it with 192.168.1.10. This is done by unbound overrides. Most home routers don't offer unbound. You may need to look into setting up a pi-hole DNS server that offers these overrides.  
 Another option that should work (but I have not looked into it!) is Hairpin NAT. 
 
-Since Nextcloud 28, there are also some MIME checks in the admin center. For these checks to work, the Nextcloud instance needs to be able to connect to the NGINX proxy!
+Since Nextcloud 28, there are also some MIME checks in the admin center. For these checks to work, the Nextcloud instance needs to be able to connect to the NGINX proxy! So that is another reason on why you need a proper local network with split DNS.  
+
+### IPv6
+IPv6 works out of the box, because there is no pesky **NAT** involved. IPv6 does not need NAT, because every device gets its own public IP.  
+You can enable DHCP6 during the Ubuntu installation, by setting it to DHCP6 or later on by adding dhcp6: true to netplan.  
+Your host will not only one but get three IPv6.  
+First one is a privacy extension enabled IPv6. Don't use that one, because it isn't static and will change. Second one is static, this is the one you want to use for nextcloud. Third one is only for local networks.  
 
 ### Optional: HTTP Strict Transport Security (HSTS)
 This  is optional.
@@ -391,8 +395,9 @@ sudo nginx -t
 sudo nginx -s reload
 ```
 
+## Certbot
 This guide assumes you have Certbot installed. If you dont have it installed yet, 
-Certbot currently recommends installing by using snap.
+Certbot currently recommends installing it by using snap.
 ```bash
 sudo apt install snapd
 sudo snap install --classic certbot
@@ -408,9 +413,9 @@ sudo certbot --nginx
 Follow the certbot instructions.
 This will create a cert and also change your config to redirect all traffic to https.
 
-If you are unable to get a cert, most of the time there is something wrong with your firewall or DNS settings. From the outside, cloud.yourdomain.com should point to the IP of 
-your nextcloud host. For IPv6 you need a firewall rule to allow traffic on port 80 to your nextcloud host. For IPv4, you need to NAT incoming Port 80 traffic to your nextcloud host.
-I can recommend you dnschecker.org, since you can input your domain name and the port 80 there. Port should be open.
+If you are unable to get a cert, most of the time there is something wrong with your firewall or DNS settings. From the outside, cloud.yourdomain.com should point to the IP of your nextcloud host. For IPv6 you need a firewall rule to allow traffic on port 80 to your nextcloud IPv6.  
+For IPv4, you need to NAT incoming port 80 traffic to your nextcloud IPv4.
+You can use webpages to check if your ports are open. Like [DNSchecker.org](https://dnschecker.org/port-scanner.php).   
 
 To test if the automatic removal is working run
 ```bash
