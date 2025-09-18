@@ -291,7 +291,7 @@ post_max_size = 0
 max_execution_time = 300
 date.timezone = Europe/Amsterdam
 opcache.memory_consumption=256
-opcache.interned_strings_buffer=32
+opcache.interned_strings_buffer=64
 ```
 
 Save and exit. Reload FPM
@@ -302,10 +302,10 @@ after reloading the webpage, you should see the changes in info.php.
 
 PHP-FPM default values are to low. Find appropiate values with this tool https://spot13.com/pmcalculator/. 
 For me this is this:
-pm.max_children = 201
-pm.start_servers = 50
-pm.min_spare_servers = 50
-pm.max_spare_servers = 50
+pm.max_children = 165
+pm.start_servers = 41
+pm.min_spare_servers = 41
+pm.max_spare_servers = 123
 
 and insert them here
 ```bash
