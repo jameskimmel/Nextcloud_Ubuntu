@@ -449,9 +449,13 @@ server {
     error_log               /var/log/nginx/error.log warn;
 
     # Max body size. You can set this on DigitalOcean to be something like 50000MB as a general config setting.
-    # I think it is easier to simply disable checking. And you could also change that for all NGINX sites, be changing it
+    # I think it is easier to simply disable checking. And you could also change that for all NGINX sites, by changing it
     # under /etc/nginx/nginx.conf instead of here.
     client_max_body_size 0;
+
+    # disable proxy buffers
+    proxy_buffering off;
+    proxy_request_buffering off;
 
     # reverse proxy
     location / {
@@ -475,8 +479,12 @@ server {
         proxy_set_header X-Forwarded-Port  $server_port;
 
         # Proxy timeouts
+
+        # default send timeout of 60s would probably be enough, just be safe we set it to 10min
         proxy_send_timeout                 600s;
-        proxy_read_timeout                 600s;
+
+        # This value should always be higher than the PHP timeout, so that always Nextcloud times out and never NGINX
+        proxy_read_timeout                 3610s;
     }
 
     location /.well-known/carddav {
