@@ -475,7 +475,6 @@ server {
         proxy_set_header X-Forwarded-Port  $server_port;
 
         # Proxy timeouts
-        proxy_connect_timeout              600s;
         proxy_send_timeout                 600s;
         proxy_read_timeout                 600s;
     }
