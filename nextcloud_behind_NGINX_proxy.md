@@ -448,9 +448,8 @@ server {
     access_log              /var/log/nginx/access.log combined buffer=512k flush=1m;
     error_log               /var/log/nginx/error.log warn;
 
-    # Max body size. You can set this on DigitalOcean to be something like 50000MB as a general config setting.
-    # I think it is easier to simply disable checking. And you could also change that for all NGINX sites, by changing it
-    # under /etc/nginx/nginx.conf instead of here.
+    # Max body size. You can set this to something like 50000MB, or simply disable the limit by setting it to 0. 
+    # You could also change that for all your NGINX sites, by changing it under /etc/nginx/nginx.conf instead of here.
     client_max_body_size 0;
 
     # disable proxy buffers
