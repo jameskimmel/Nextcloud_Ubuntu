@@ -494,6 +494,10 @@ server {
     return 301 $scheme://$host/remote.php/dav;
     }
 
+    location ^~ /.well-known {
+    return 301 $scheme://$host/index.php$uri;
+    }
+
 }
 
 
