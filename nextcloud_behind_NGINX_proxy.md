@@ -146,14 +146,14 @@ insert
 transaction_isolation = READ-COMMITTED
 binlog_format = ROW
 ```
-exit and save (Ctrl + x and Y).
+exit and save (Ctrl + X and Y).
 
 Reload mariadb
 ```bash
 sudo systemctl restart mariadb.service
 ```
 
-Secure MariaDB. Insert a root password, otherwise just use the defaults by pressing enter.
+Secure MariaDB. Just always press enter to use the defaults and to set a new root password. 
 ```bash
 sudo mariadb-secure-installation
 ```
