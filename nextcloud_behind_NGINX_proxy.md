@@ -406,11 +406,6 @@ Test the config
 sudo apachectl configtest
 ```
 
-## Install NGINX
-You probably have NGINX already installed and can skip this section. 
-Otherwise install it like described here:
-https://nginx.org/en/linux_packages.html#Ubuntu
-
 ## NGINX settings on the reverse Proxy
 First we create an emtpy site without ssl.
 ```bash
