@@ -133,7 +133,6 @@ sudo apt install ffmpeg \
 ```
 
 ## MariaDB
-
 Change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
 ```bash
 sudo nano /etc/mysql/conf.d/nextcloud.cnf
@@ -151,10 +150,11 @@ Reload mariadb
 sudo systemctl restart mariadb.service
 ```
 
-Secure MariaDB. Just always press enter to use the defaults and to set a new root password. 
+Secure MariaDB. Always press enter to use the defaults and to set a new root password. 
 ```bash
 sudo mariadb-secure-installation
 ```
+at the end you will see "Thanks for using MariaDB!" and exit MariDB.
 
 Create the database
 ```bash
@@ -173,11 +173,11 @@ SELECT @@global.binlog_format;
 now you should see the "ROW".  
 
 If everything looks good, we can continue. 
-Insert this to create a database called nextcloud. Replace all three x_ variables with your data.
+Insert this to create a database called nextcloud. Replace 'password' with your own password.
 ```mysql
-CREATE USER 'x_database_user'@'localhost' IDENTIFIED BY 'x_database_password';
+CREATE USER 'nextcloud_db_user'@'localhost' IDENTIFIED BY 'password';
 CREATE DATABASE IF NOT EXISTS nextcloud CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-GRANT ALL PRIVILEGES ON nextcloud.* TO 'x_database_user'@'localhost';
+GRANT ALL PRIVILEGES ON nextcloud.* TO 'nextcloud_db_user'@'localhost';
 FLUSH PRIVILEGES;
 exit;
 ```
