@@ -48,13 +48,46 @@ sudo dpkg-reconfigure unattended-upgrades
 ```
 
 ## Install packages
-Different versions of Ubuntu may have differing versions of PHP, for example Ubuntu 24.04 ships PHP 8.3.6, which is by pure luck the currently recommended version by Nextcloud. If the PHP version does not match, you can add other repositories. Adding  repositories to apt's sources (e.g. Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) or [dpa for Debian](https://packages.sury.org/php/)) is beyond the scope of this tutorial.  
-I think it is simpler to use the Ubuntu PHP version, but adding a PPA is also not that hard. The choice is yours :)
-For up to date system requirements, please visit [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html)  
-
-We install all the software that is needed plus some optional software that is needed so we won't get warnings in the Nextcloud Admin Center.  
-Ubuntu 24.04 comes with MariaDB 10.11.8 which is currently the recommended version. 
+Different versions of Ubuntu may have differing versions of PHP, for example Ubuntu 24.04.3 ships PHP 8.3.6, which is no longer the recommended PHP Version.
+For up to date recommendations, visit [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html)  
+Since Nextcloud recommends PHP 8.4, we need to add Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) to apt's sources. 
+We also add his apache2 comability packages. 
 ```bash
+sudo add-apt-repository ppa:ondrej/php
+sudo add-apt-repository ppa:ondrej/apache2
+```
+press to times Enter to add them.
+
+Ubuntu 24.04.3 comes with MariaDB 10.11.8 which isn't the currently the recommended version 11.4. 
+Here are the commands to run to import the MariaDB repository key on your Ubuntu system:
+```bash
+sudo apt-get install apt-transport-https curl
+sudo mkdir -p /etc/apt/keyrings
+sudo curl -o /etc/apt/keyrings/mariadb-keyring.pgp 'https://mariadb.org/mariadb_release_signing_key.pgp'
+```
+Once the key is imported, we add the source by creating a file with:
+```bash
+sudo nano /etc/apt/sources.list.d/mariadb.sources
+```
+and then paste this 
+```bash
+# MariaDB 11.4 repository list - created 2025-10-24 13:17 UTC
+# https://mariadb.org/download/
+X-Repolib-Name: MariaDB
+Types: deb
+# deb.mariadb.org is a dynamic mirror if your preferred mirror goes offline. See https://mariadb.org/mirrorbits/ for details.
+# URIs: https://deb.mariadb.org/11.4/ubuntu
+URIs: https://mirror.rackspace.com/mariadb/repo/11.4/ubuntu
+Suites: noble
+Components: main main/debug
+Signed-By: /etc/apt/keyrings/mariadb-keyring.pgp
+```
+save and exit by pressing CTRL - X and confirm with Y.
+
+Ubuntu 24.04.3 comes with Apache2 2.4 so wo don't need to add anything. 
+We install all the software that is needed plus some optional software that is needed so we won't get warnings in the Nextcloud Admin Center.
+```bash
+sudo apt update
 sudo apt install apache2 \
   bzip2 \
   exif \
@@ -65,34 +98,34 @@ sudo apt install apache2 \
 
 Install required php modules.
 ```bash
-sudo apt install php-common \
-  php-curl \
-  php-xml \
-  php-gd \
-  php-imagick \
-  php-mbstring \
-  php-zip
+sudo apt install php8.4-common \
+  php8.4-curl \
+  php8.4-xml \
+  php8.4-gd \
+  php8.4-imagick \
+  php8.4-mbstring \
+  php8.4-zip
 ```
 
 install DB connector
 ```bash
-sudo apt install php-mysql
+sudo apt install php8.4-mysql
 ```
 
 install recommended modules
 ```bash
-sudo apt install php-intl
+sudo apt install php8.4-intl
 ```
 
 install performance modules
 ```bash
-sudo apt install php-apcu \
+sudo apt install php8.4-apcu \
   php-redis 
 ```
 install these for passwordless logins and performance:
 ```bash
-sudo apt install php-bcmath \
-  php-gmp 
+sudo apt install php8.4-bcmath \
+  php8.4-gmp 
 ```
 
 optionally you could install ffmpeg (videos) and LibreOffice (Word, Excel, PowerPoint) for preview generation. Beware, these are pretty big.
@@ -100,6 +133,7 @@ optionally you could install ffmpeg (videos) and LibreOffice (Word, Excel, Power
 sudo apt install ffmpeg \
   libreoffice 
 ```
+
 ## MariaDB
 
 Change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
