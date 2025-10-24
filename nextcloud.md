@@ -9,7 +9,6 @@ This is the structure of the setup used in this guide.
 ![Unbenanntes Diagramm drawio](https://github.com/jameskimmel/Nextcloud_Ubuntu/assets/17176225/fa1cdce1-7e24-4cdf-8845-b354a0a85b71)
 
 ## Network requirements
-
 If you want to access Nextcloud remotely and share files with external users, there are some network requirements.  
 You need a real, public routable, none Carrier-grade NAT (CG-NAT) IPv4 address.  
 Don't know what CG-NAT is?  
