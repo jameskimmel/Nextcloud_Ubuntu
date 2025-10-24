@@ -408,7 +408,6 @@ sudo apachectl configtest
 ```
 
 ## NGINX settings on the reverse Proxy
-
 First we create an emtpy site without ssl.
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
