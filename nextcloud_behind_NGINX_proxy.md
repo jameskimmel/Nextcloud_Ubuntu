@@ -119,7 +119,7 @@ sudo apt install php8.4-intl
 install performance modules
 ```bash
 sudo apt install php8.4-apcu \
-  php-redis 
+  php8.4-redis 
 ```
 install these for passwordless logins and performance:
 ```bash
