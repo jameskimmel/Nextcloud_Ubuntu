@@ -543,10 +543,10 @@ sudo nginx -s reload
 ## Install Nextcloud 
 You can install Nextcloud via the webGUI over IP, over the domain name or in the console. 
 I would recommend you using your domain name. That way you can save some work and test if your DNS is working.
-Even better, use your real domain name over a hotspot. That way you see if you can really access cloud.yourdomain.com.
+Even better, use your real domain name over a hotspot. That way you see if you can really access cloud.yourdomain.com from remote.
 
 On the webGUI you can define a admin username and password. 
-We insert x_database_user and x_database_password and also the database name "nextcloud".
+We insert "nextcloud_db_user" and "password" and the database name "nextcloud".
 Host we can leave at "localhost". Then click on install.
 
 If you wan't to use CLI, use these commands:
@@ -554,13 +554,13 @@ If you wan't to use CLI, use these commands:
 cd /var/www/nextcloud/
 sudo -u www-data php occ  maintenance:install \
 --database='mysql' --database-name='nextcloud' \
---database-user='x_database_user' --database-pass='x_database_password' \
+--database-user='nextcloud_db_user' --database-pass='x_database_password' \
 --admin-user='x_nextcloud_admin_user' --admin-pass='x_nextcloud_admin_user_password' \
 --data-dir='/var/www/nextcloud/data'
 ```
 
-Congrats, we now have a working Nextcloud instance! 
-Don't worry if you see a warning about an untrusted domain or IP. 
+Congrats, we now have a semi working Nextcloud instance! 
+Don't worry if you see warnings in the admin center.
 We solve that in the next step. 
 
 ## PHP config settings
