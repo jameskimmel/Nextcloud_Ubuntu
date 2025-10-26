@@ -463,6 +463,7 @@ server {
 
     listen 443 ssl; # managed by Certbot
     listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    http2 on;
     ssl_certificate /etc/letsencrypt/live/cloud.x_youromain.com/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/cloud.x_youromain.com/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
@@ -476,18 +477,23 @@ server {
     access_log              /var/log/nginx/access.log combined buffer=512k flush=1m;
     error_log               /var/log/nginx/error.log warn;
 
-    # Max body size. You can set this to something like 50000MB, or simply disable the limit by setting it to 0. 
-    # You could also change that for all your NGINX sites, by changing it under /etc/nginx/nginx.conf instead of here.
     client_max_body_size 0;
+    client_body_buffer_size 512k;
+
+    # This value should be higher than the PHP timeout (1h), so that Nextcloud always times out and not NGINX
+    proxy_read_timeout 3610s;
 
     # disable proxy buffers
     proxy_buffering off;
     proxy_request_buffering off;
 
+    # add headers. Comment second line, if you don't use HSTS   
+    add_header Referrer-Policy           "no-referrer" always;
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;   
+    
     # reverse proxy
     location / {
-        proxy_pass            http://x_nextcloud_host_IPv4/;
-        proxy_set_header Host $host;
+        proxy_pass            http://x_nextcloud_host_IPv4:80$request_uri;
 
         proxy_http_version                 1.1;
         proxy_cache_bypass                 $http_upgrade;
@@ -499,33 +505,16 @@ server {
         proxy_set_header Upgrade           $http_upgrade;
         proxy_set_header Connection        $connection_upgrade;
         proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header Forwarded         $proxy_add_forwarded;
         proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        # is the next line still needed?
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-Host  $host;
         proxy_set_header X-Forwarded-Port  $server_port;
+        proxy_set_header Host 	           $host;
 
-        # Proxy timeouts
-
-        # default send timeout of 60s would probably be enough, just be safe we set it to 10min
-        proxy_send_timeout                 600s;
-
-        # This value should always be higher than the PHP timeout, so that always Nextcloud times out and never NGINX
+        # This value should always be higher than the PHP timeout (1h), so that always Nextcloud times out 	and never NGINX
         proxy_read_timeout                 3610s;
-    }
-
-    location /.well-known/carddav {
-    return 301 $scheme://$host/remote.php/dav;
-    }
-
-    location /.well-known/caldav {
-    return 301 $scheme://$host/remote.php/dav;
-    }
-
-    location ^~ /.well-known {
-    return 301 $scheme://$host/index.php$uri;
-    }
-
+        }
 }
 
 
