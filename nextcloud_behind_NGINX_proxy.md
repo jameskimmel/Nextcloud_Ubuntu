@@ -410,7 +410,7 @@ should show 'Syntax ok'
 ## NGINX settings on the reverse Proxy
 First we create an emtpy site without ssl.
 ```bash
-sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
+sudo nano /etc/nginx/sites-available/cloud.x_yourdomain.conf
 ```
 
 ```NGINX
@@ -456,16 +456,13 @@ sudo certbot renew --dry-run
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
 ```
-At the time of writing this, certbot does not add http2 on by default and the DigitalOcean adds it to the wrong place.
-That is why we add the line "http2 on" and configure the listen directives differently. 
-You also need to change change the proxy pass IP line and all the cloud.x_youromain.com variables. In the end, it should look like this:
+Change change the proxy pass IP line and all the cloud.x_youromain.com variables. In the end, it should look like this:
 ```NGINX
 server {
     server_name cloud.x_youromain.com;
 
-    listen [::]:443 ssl; # managed by Certbot
     listen 443 ssl; # managed by Certbot
-    http2  on;
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/cloud.x_youromain.com/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/cloud.x_youromain.com/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
