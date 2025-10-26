@@ -207,17 +207,17 @@ rm  latest.tar.bz2 latest.tar.bz2.sha256
 
 ## PHP FPM
 
-We stop apache, install FPM and enable the modules. Replace 8.3 with newer version if needed.
+We stop apache, install FPM and enable the modules. Replace 8.4 with newer version if needed.
 ```bash
 sudo systemctl stop apache2
-sudo apt install php-fpm
+sudo apt install php8.4-fpm
 sudo a2enmod proxy_fcgi setenvif
-sudo a2enconf php8.3-fpm
+sudo a2enconf php8.4-fpm
 ```
 
-We set the hostname of our server. This should be a FQDN.
+We set the hostname of our server so we don't get any warning from the apache config test. This should be a FQDN.
 ```bash
-sudo hostnamectl set-hostname cloud.x_youdomain.com
+sudo hostnamectl set-hostname cloud.x_yourdomain.com
 ```
 
 Test the config
@@ -237,7 +237,7 @@ In the next steps, we enable MPM event.
 sudo systemctl stop apache2
 ```
 ```bash
-sudo a2dismod php8.3
+sudo a2dismod php8.4
 ```
 should not exist
 
@@ -252,7 +252,7 @@ sudo a2enmod mpm_event
 should be enabled already
 
 ```bash
-sudo a2enconf php8.3-fpm
+sudo a2enconf php8.4-fpm
 ```
 should be enabled already
 
@@ -311,25 +311,26 @@ In your browser, enter the IP of your Nextcloud host (for example http://192.168
 Add /info.php to the end (http://x_nextcloud_host_IPv4/info.php) and you can see the PHP infos. The fourth line should be "Server API" with "FPM/FastCGI".  
 
 ## PHP settings
-We wanna change the PHP memory limit and upload filesize. Replace 8.3 if you have a newer version of PHP.
+We wanna change the PHP memory limit and upload filesize. Replace 8.4 if you have a newer version of PHP.
 ```bash
-sudo nano /etc/php/8.3/fpm/php.ini
+sudo nano /etc/php/8.4/fpm/php.ini
 ```
 
 We search for these settings to change (use ctrl+W to search in nano). Watch out to delete the ; before the opcache settings, otherwise they are commented out. 
 ```bash
 memory_limit = 1G
 upload_max_filesize = 50G
+max_file_uploads = 200
 post_max_size = 0
-max_execution_time = 300
-date.timezone = Europe/Amsterdam
+max_execution_time = 3600
+date.timezone = Europe/Zurich
 opcache.memory_consumption=256
 opcache.interned_strings_buffer=64
 ```
 
 Save and exit. Reload FPM
 ```bash
-sudo systemctl reload php8.3-fpm.service 
+sudo systemctl reload php8.4-fpm.service 
 ```
 after reloading the webpage, you should see the changes in info.php.
 
@@ -342,7 +343,7 @@ pm.max_spare_servers = 123
 
 and insert them here
 ```bash
-sudo nano /etc/php/8.3/fpm/pool.d/www.conf
+sudo nano /etc/php/8.4/fpm/pool.d/www.conf
 ```
 
 in the same file, uncomment these environment variables:
@@ -355,7 +356,7 @@ in the same file, uncomment these environment variables:
 ```
 You should see these changes on the webpage after you restart FPM
 ```bash
-sudo systemctl reload php8.3-fpm.service 
+sudo systemctl reload php8.4-fpm.service 
 ```
 
 ## Apache2
@@ -391,7 +392,6 @@ Enable site and mods:
 ```bash
 sudo a2ensite nextcloud.conf
 sudo a2enmod rewrite headers env dir mime setenvif
-sudo systemctl restart apache2
 ```
 
 We disable the default page and delete the default folder.
@@ -405,6 +405,7 @@ Test the config
 ```bash
 sudo apachectl configtest
 ```
+should show 'Syntax ok'
 
 ## NGINX settings on the reverse Proxy
 First we create an emtpy site without ssl.
