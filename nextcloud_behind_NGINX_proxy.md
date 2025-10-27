@@ -467,13 +467,9 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
-    add_header Referrer-Policy           "no-referrer" always;
-    add_header Permissions-Policy        "interest-cohort=()" always;
-    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
-
-    # logging
-    access_log              /var/log/nginx/access.log combined buffer=512k flush=1m;
-    error_log               /var/log/nginx/error.log warn;
+    # disable proxy buffers
+    proxy_buffering off;
+    proxy_request_buffering off;
 
     client_max_body_size 0;
     client_body_buffer_size 512k;
@@ -481,13 +477,13 @@ server {
     # This value should be higher than the PHP timeout (1h), so that Nextcloud always times out and not NGINX
     proxy_read_timeout 3610s;
 
-    # disable proxy buffers
-    proxy_buffering off;
-    proxy_request_buffering off;
-
-    # add headers. Comment second line, if you don't use HSTS   
+    # add headers. Comment second line, if you don't use HSTS
     add_header Referrer-Policy           "no-referrer" always;
-    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;   
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    # logging
+    access_log              /var/log/nginx/access.log combined buffer=512k flush=1m;
+    error_log               /var/log/nginx/error.log warn;
     
     # reverse proxy
     location / {
