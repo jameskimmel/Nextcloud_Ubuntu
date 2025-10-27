@@ -1,4 +1,4 @@
-# Example installation on Ubuntu 24.04.01 LTS with Apache2,PHP FPM, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
+# Example installation on Ubuntu 24.04.03 LTS with Apache2,PHP FPM, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.  
@@ -510,7 +510,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-Host  $host;
         proxy_set_header X-Forwarded-Port  $server_port;
-        proxy_set_header Host 	           $host;
+        proxy_set_header Host              $host;
 
         # This value should always be higher than the PHP timeout (1h), so that always Nextcloud times out 	and never NGINX
         proxy_read_timeout                 3610s;

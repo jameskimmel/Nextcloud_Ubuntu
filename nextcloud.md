@@ -1,4 +1,4 @@
-# Example installation on Ubuntu 24.04.01 LTS with Apache2, PHP FPM, APCu, redis, and MariaDB, no Docker, no Snap
+# Example installation on Ubuntu 24.04.03 LTS with Apache2, PHP FPM, APCu, redis, and MariaDB, no Docker, no Snap
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal. No Docker, no Snap.  
