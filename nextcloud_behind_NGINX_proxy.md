@@ -291,7 +291,6 @@ sudo apachectl -M | grep 'proxy'
 ```
 should output 
 ```bash
-Output
 proxy_module (shared)
 proxy_fcgi_module (shared)
 ```
