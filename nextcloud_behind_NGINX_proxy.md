@@ -367,7 +367,7 @@ Configure Apache2
 ```bash
 sudo nano /etc/apache2/sites-available/nextcloud.conf
 ```
-insert and change the x variable:
+insert and change the ServerName variable:
 ```bash
 <VirtualHost *:80>
   DocumentRoot /var/www/nextcloud/
@@ -692,7 +692,7 @@ extension=apcu.so
 apc.enabled=1
 apc.enable_cli=1
 ```
-To start APCu automatically use this command and replace the PHP version 8.4 if needed
+To start APCu automatically use this command:
 ```bash
 sudo -u www-data php --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
 ```
