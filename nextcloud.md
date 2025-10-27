@@ -650,7 +650,14 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensi
 sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
 ```
 
-Congrats! You should no have no warnings in the admin center and a perfect score on scan.nextcloud.com!
+### Disable AppAPI
+Disable the AppAPI by clicking on your profile -> Apps and then disable the AppAPI app. 
+
+### Enable Two-Factor TOTP Provider
+While you are at it, I recommend you enable Two-Factor TOTP Provider for 2FA.
+
+Congrats! You should no have no warnings in the admin center and a perfect score 
+on scan.nextcloud.com. 
 
 ### NFS share as data directory (optional)
 Instead of using local storage, you can move the data directory to a NFS mount. 
