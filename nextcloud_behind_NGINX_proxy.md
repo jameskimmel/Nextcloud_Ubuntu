@@ -564,7 +564,8 @@ Don't worry if you see warnings in the admin center.
 We solve that in the next step. 
 
 ## PHP config settings
-Depending if you used the CLI or webpage, some values maybe already correct.
+Depending if you used the CLI or webpage, some values maybe already set correct automatically.
+We still need to make some changes.
 
 Edit config.php file. 
 ```bash
@@ -578,7 +579,7 @@ If not already done, set the trusted_domains array
   ),
 ```
 
-Set the IP of our trusted NGINX proxy
+Set the IP of our trusted NGINX proxy. Don't forget to change the IP.
 ```bash
   'trusted_proxies' =>
   array (
@@ -624,6 +625,7 @@ Change the settings by
 ```bash
 sudo -u www-data php /var/www/nextcloud/occ background:cron
 ```
+
 ## Mail
 In the web GUI, go to user settings and insert the mail address for the x_nextcloud_admin_user you created earlier. 
 Naviate to Administration -> Basic settings to set up outgoing mail. In my example, I am using Office365 with an AppPassword created in the account settings of MS365.
@@ -640,6 +642,8 @@ Check if Opcache is working
 ```bash
 php -r 'phpinfo();' | grep opcache.enable
 ```
+should show "on" for the first line
+
 ### Redis
 Add redis to the www-data group
 ```bash
@@ -662,7 +666,7 @@ Check output of redis
 ```bash
 ls -lh /var/run/redis
 ```
-Change nextcloud PHP config. 
+We enable memcache in the PHP settings.
 While we are in this file, we also add the memcache.local for APCu.
 
 ```bash
@@ -674,7 +678,7 @@ Add:
   'memcache.locking' => '\OC\Memcache\Redis',
   'redis' =>
   array (
-   'host'     => '/run/redis/redis-server.sock',
+   'host'     => 'localhost',
    'port'     => 0,
   ),
 ```
@@ -682,7 +686,7 @@ Add:
 ### APCu
 Change apcu.ini. Watch out for the PHP version
 ```bash
-sudo nano /etc/php/8.3/fpm/conf.d/20-apcu.ini 
+sudo nano /etc/php/8.4/fpm/conf.d/20-apcu.ini 
 ```
 Change it to: 
 ```config
@@ -690,14 +694,16 @@ extension=apcu.so
 apc.enabled=1
 apc.enable_cli=1
 ```
-To start APCu automatically use this command and replace the PHP version 8.3 if needed
+To start APCu automatically use this command and replace the PHP version 8.4 if needed
 ```bash
 sudo -u www-data php --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
 ```
 
 ## Configure Apache2 HSTS
-Probably only cosmetics, because it is already done by the proxy. 
-Anyway setting this will remove the warning in the admin center.
+This is section longer needed. 
+Was only cosmetics, because it is already done by the proxy. 
+Setting this removed the warning in the admin center in the past.
+Does not seem to be used anymore.
 ```bash
 sudo nano /etc/apache2/sites-available/nextcloud.conf
 ```
@@ -761,6 +767,9 @@ sudo -u www-data php /var/www/nextcloud/occ config:system:set maintenance_window
 sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
 sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
 ```
+
+### Disable AppAPI
+Disable the AppAPI by clicking on your profile -> Apps and then disable the AppAPI app. 
 
 Congrats! You should no have no warnings in the admin center and a perfect score 
 on scan.nextcloud.com. 
