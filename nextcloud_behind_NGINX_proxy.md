@@ -283,7 +283,6 @@ sudo apachectl -M | grep 'mpm'
 ```
 should output 
 ```bash
-Output
 mpm_event_module (shared)
 ```
 and 
