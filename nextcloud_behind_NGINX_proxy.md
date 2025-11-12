@@ -48,9 +48,9 @@ sudo dpkg-reconfigure unattended-upgrades
 
 ## Install packages
 Different versions of Ubuntu may have differing versions of PHP, for example Ubuntu 24.04.3 ships PHP 8.3.6, which is no longer the recommended PHP Version.
-For up to date recommendations, visit [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html)  
+For up to date recommendations, visit [Nextcloud admin manual](https://docs.nextcloud.com/server/stable/admin_manual/installation/system_requirements.html)  
 Since Nextcloud recommends PHP 8.4, we need to add Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) to apt's sources. 
-We also add his apache2 comability packages. 
+We also add his apache2 compatbility packages. 
 ```bash
 sudo add-apt-repository ppa:ondrej/php
 sudo add-apt-repository ppa:ondrej/apache2
@@ -58,7 +58,11 @@ sudo add-apt-repository ppa:ondrej/apache2
 press to times Enter to add them.
 
 Ubuntu 24.04.3 comes with MariaDB 10.11.8 which isn't the currently the recommended version 11.4. 
-Here are the commands to run to import the MariaDB repository key on your Ubuntu system:
+[Here](https://mariadb.org/download/?t=repo-config) you find how to install the right MariDB version on your system. 
+
+This is how you would do it for 24.04.3 and 11.4:  
+
+Import the MariaDB repository key on your Ubuntu system:
 ```bash
 sudo apt-get install apt-transport-https curl
 sudo mkdir -p /etc/apt/keyrings
@@ -83,7 +87,8 @@ Signed-By: /etc/apt/keyrings/mariadb-keyring.pgp
 ```
 save and exit by pressing CTRL - X and confirm with Y.
 
-Ubuntu 24.04.3 comes with Apache2 2.4 so wo don't need to add anything. 
+Ubuntu 24.04.3 comes with Apache2 2.4 so wo don't need to add anything here. 
+
 We install all the software that is needed plus some optional software that is needed so we won't get warnings in the Nextcloud Admin Center.
 ```bash
 sudo apt update
