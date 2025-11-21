@@ -47,45 +47,24 @@ sudo dpkg-reconfigure unattended-upgrades
 ```
 
 ## Install packages
-Different versions of Ubuntu may have differing versions of PHP, for example Ubuntu 24.04.3 ships PHP 8.3.6, which is no longer the recommended PHP Version.
+Different Ubuntu releases have different official distro-provided PHP versions. As an example, Ubuntu 24.04.3 uses PHP 8.3.6. 
+Ubuntu is pretty often laggin behind what Nextcloud recommends.  
 For up to date recommendations, visit [Nextcloud admin manual](https://docs.nextcloud.com/server/stable/admin_manual/installation/system_requirements.html)  
-Since Nextcloud recommends PHP 8.4, we need to add Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) to apt's sources. 
-We also add his apache2 compatbility packages. 
+Since Nextcloud often recommends a newer version of PHP than what Ubuntu offers, we might need to add Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) to apt's sources.  
+
+By pure luck, the currently by Nextcloud recommended Ubuntu version 24.04 matches the currently recommended PHP version 8.3.  
+So technically you currently don't need Ondrejs PHP packages. I still would recommend it though for future releases. 
+
+To add his PHP and Apache2 package, run this:
 ```bash
 sudo add-apt-repository ppa:ondrej/php
 sudo add-apt-repository ppa:ondrej/apache2
 ```
 press to times Enter to add them.
 
-Ubuntu 24.04.3 comes with MariaDB 10.11.8 which isn't the currently the recommended version 11.4. 
-[Here](https://mariadb.org/download/?t=repo-config) you find how to install the right MariDB version on your system. 
-
-This is how you would do it for 24.04.3 and 11.4:  
-
-Import the MariaDB repository key on your Ubuntu system:
-```bash
-sudo apt-get install apt-transport-https curl
-sudo mkdir -p /etc/apt/keyrings
-sudo curl -o /etc/apt/keyrings/mariadb-keyring.pgp 'https://mariadb.org/mariadb_release_signing_key.pgp'
-```
-Once the key is imported, we add the source by creating a file with:
-```bash
-sudo nano /etc/apt/sources.list.d/mariadb.sources
-```
-and then paste this 
-```bash
-# MariaDB 11.4 repository list - created 2025-10-24 13:17 UTC
-# https://mariadb.org/download/
-X-Repolib-Name: MariaDB
-Types: deb
-# deb.mariadb.org is a dynamic mirror if your preferred mirror goes offline. See https://mariadb.org/mirrorbits/ for details.
-# URIs: https://deb.mariadb.org/11.4/ubuntu
-URIs: https://mirror.rackspace.com/mariadb/repo/11.4/ubuntu
-Suites: noble
-Components: main main/debug
-Signed-By: /etc/apt/keyrings/mariadb-keyring.pgp
-```
-save and exit by pressing CTRL - X and confirm with Y.
+Ubuntu 24.04.3 comes with MariaDB 10.11.8 which is the currently the recommended version.  
+If you need a newer version,
+[Here](https://mariadb.org/download/?t=repo-config) you find how to install MariaDB from MariaDB directly instead of Ubuntu.   
 
 Ubuntu 24.04.3 comes with Apache2 2.4 so wo don't need to add anything here. 
 
@@ -102,34 +81,34 @@ sudo apt install apache2 \
 
 Install required php modules.
 ```bash
-sudo apt install php8.4-common \
-  php8.4-curl \
-  php8.4-xml \
-  php8.4-gd \
-  php8.4-imagick \
-  php8.4-mbstring \
-  php8.4-zip
+sudo apt install php8.3-common \
+  php8.3-curl \
+  php8.3-xml \
+  php8.3-gd \
+  php8.3-imagick \
+  php8.3-mbstring \
+  php8.3-zip
 ```
 
 install DB connector
 ```bash
-sudo apt install php8.4-mysql
+sudo apt install php8.3-mysql
 ```
 
 install recommended modules
 ```bash
-sudo apt install php8.4-intl
+sudo apt install php8.3-intl
 ```
 
 install performance modules
 ```bash
-sudo apt install php8.4-apcu \
-  php8.4-redis 
+sudo apt install php8.3-apcu \
+  php8.3-redis 
 ```
 install these for passwordless logins and performance:
 ```bash
-sudo apt install php8.4-bcmath \
-  php8.4-gmp 
+sudo apt install php8.3-bcmath \
+  php8.3-gmp 
 ```
 
 optionally you could install ffmpeg (videos) and LibreOffice (Word, Excel, PowerPoint) for preview generation. Beware, these are pretty big.
@@ -212,12 +191,12 @@ rm  latest.tar.bz2 latest.tar.bz2.sha256
 
 ## PHP FPM
 
-We stop apache, install FPM and enable the modules. Replace 8.4 with newer version if needed.
+We stop apache, install FPM and enable the modules. Replace 8.3 with newer version if needed.
 ```bash
 sudo systemctl stop apache2
-sudo apt install php8.4-fpm
+sudo apt install php8.3-fpm
 sudo a2enmod proxy_fcgi setenvif
-sudo a2enconf php8.4-fpm
+sudo a2enconf php8.3-fpm
 ```
 
 We set the hostname of our server so we don't get any warning from the apache config test. This should be a FQDN.
@@ -242,7 +221,7 @@ In the next steps, we enable MPM event.
 sudo systemctl stop apache2
 ```
 ```bash
-sudo a2dismod php8.4
+sudo a2dismod php8.3
 ```
 should not exist
 
@@ -257,7 +236,7 @@ sudo a2enmod mpm_event
 should be enabled already
 
 ```bash
-sudo a2enconf php8.4-fpm
+sudo a2enconf php8.3-fpm
 ```
 should be enabled already
 
@@ -314,9 +293,9 @@ In your browser, enter the IP of your Nextcloud host (for example http://192.168
 Add /info.php to the end (http://x_nextcloud_host_IPv4/info.php) and you can see the PHP infos. The fourth line should be "Server API" with "FPM/FastCGI".  
 
 ## PHP settings
-We wanna change the PHP memory limit and upload filesize. Replace 8.4 if you have a newer version of PHP.
+We wanna change the PHP memory limit and upload filesize. Replace 8.3 if you have a newer version of PHP.
 ```bash
-sudo nano /etc/php/8.4/fpm/php.ini
+sudo nano /etc/php/8.3/fpm/php.ini
 ```
 
 We search for these settings to change (use ctrl+W to search in nano). Watch out to delete the ; before the opcache settings, otherwise they are commented out. 
@@ -333,7 +312,7 @@ opcache.interned_strings_buffer=64
 
 Save and exit. Reload FPM
 ```bash
-sudo systemctl reload php8.4-fpm.service 
+sudo systemctl reload php8.3-fpm.service 
 ```
 after reloading the webpage, you should see the changes in info.php.
 
@@ -346,7 +325,7 @@ pm.max_spare_servers = 123
 
 and insert them here
 ```bash
-sudo nano /etc/php/8.4/fpm/pool.d/www.conf
+sudo nano /etc/php/8.3/fpm/pool.d/www.conf
 ```
 
 in the same file, uncomment these environment variables:
@@ -359,7 +338,7 @@ in the same file, uncomment these environment variables:
 ```
 You should see these changes on the webpage after you restart FPM
 ```bash
-sudo systemctl reload php8.4-fpm.service 
+sudo systemctl reload php8.3-fpm.service 
 ```
 
 ## Apache2
@@ -685,7 +664,7 @@ Add:
 ### APCu
 Change apcu.ini. Watch out for the PHP version
 ```bash
-sudo nano /etc/php/8.4/fpm/conf.d/20-apcu.ini 
+sudo nano /etc/php/8.3/fpm/conf.d/20-apcu.ini 
 ```
 Change it to: 
 ```config
