@@ -6,7 +6,7 @@ The goal of this guide is to have **no warnings in the admin center** and the in
 There are some placeholder values or variables that always start with x_. You need to replace them with your data.  
 This is the structure of the setup used in this guide.
 
-![setup](https://github.com/jameskimmel/Nextcloud_Ubuntu/assets/17176225/a5aae0e5-6560-4c4f-9a6d-cf062b1fdb8b)
+
 
 ## Network requirements
 If you want to access Nextcloud remotely and share files with external users, there are some network requirements.  
@@ -83,4 +83,4 @@ I like to start with an almost empty cloud.x_yourdomain.com.conf file
 ```bash
 sudo nano /etc/nginx/sites-available/
 ```
-insert the text from [files/intial_NGINX.conf]()
+insert the text from [files/intial_NGINX.conf](https://github.com/jameskimmel/Nextcloud_Ubuntu/blob/main/files/intial_NGINX.conf)
