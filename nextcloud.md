@@ -25,6 +25,15 @@ But if you are on your local network, that will not work, because your firewall 
 The easiest way to solve this is to use split DNS. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1, it should answer it with 192.168.1.10. This is done by unbound overrides. Most home routers don't offer unbound. You may need to look into setting up a pi-hole DNS server that offers these overrides.  
 Another option that should work (but I have not looked into it!) is Hairpin NAT.  
 
+If you are unable to do both, there is also the option to set change the host files of each client. But this is pretty cumbersome, because you have to do it for each client by hand. For Windows you have to change the C:\Windows\system32\drivers\etc\hosts file like described [here](https://www.howtogeek.com/784196/how-to-edit-the-hosts-file-on-windows-10-or-11/). For Linux simply run 
+```bash
+sudo nano /etc/hosts
+```
+and insert the IPv4 override
+```bash
+192.168.1.10 cloud.x_yourdomain.com
+```
+
 ### IPv6
 IPv6 works out of the box, because there is no pesky **NAT** involved. IPv6 does not need NAT, because every device gets its own public IP.  
 You can enable DHCP6 during the Ubuntu installation, by setting it to DHCP6 or later on by adding dhcp6: true to netplan.  

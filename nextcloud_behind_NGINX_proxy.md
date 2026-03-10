@@ -20,12 +20,19 @@ You also need split DNS described in the next paragraph.
 What is split DNS and why is it needed for IPv4?  
 Let's assume your WAN IPv4 is 85.29.10.1 and your NGINX Proxy has the IP 192.168.1.10 and your domain is cloud.yourdomain.com.  
 If you are on the road and try to connect to your Nextcloud, your client will ask "Hey, what IP is cloud.yourdomain.com?" a DNS server will answer with "85.29.10.1".
-Then traffic will go to your firewall and some kind of **NAT** will redirect it to your Nextcloud instance on 192.168.1.10. 
+Then traffic will go to your firewall and some kind of **NAT** will redirect it to your NGINX reverse proxy on 192.168.1.10 (which in return proxy passes you to the Nextcloud instance). 
 But if you are on your local network, that probably will not work, because your firewall only NATs from WAN to LAN and not LAN to LAN. 
 The easiest way to solve this is to use split DNS. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it should answer it with 192.168.1.10. This is done by unbound overrides. Most home routers don't offer unbound. You may need to look into setting up a pi-hole DNS server that offers these overrides.  
-Another option that should work (but I have not looked into it!) is Hairpin NAT. 
+Another, often more complicated option that also should work (but I have not looked into it!) is Hairpin NAT. 
 
-Since Nextcloud 28, there are also some MIME checks in the admin center. For these checks to work, the Nextcloud instance needs to be able to connect to the NGINX proxy! So that is another reason on why you need a proper local network with split DNS.  
+If you are unable to do both, there is also the option to set change the host files of each client. But this is pretty cumbersome, because you have to do it for each client by hand. For Windows you have to change the C:\Windows\system32\drivers\etc\hosts file like described [here](https://www.howtogeek.com/784196/how-to-edit-the-hosts-file-on-windows-10-or-11/). For Linux simply run 
+```bash
+sudo nano /etc/hosts
+```
+and insert the IPv4 override
+```bash
+192.168.1.10 cloud.x_yourdomain.com
+```
 
 ### IPv6
 IPv6 works out of the box, because there is no pesky **NAT** involved. IPv6 does not need NAT, because every device gets its own public IP.  
