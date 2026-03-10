@@ -6,7 +6,7 @@ The goal of this guide is to have **no warnings in the admin center** and the in
 There are some placeholder values or variables that always start with x_. You need to replace them with your data.  
 This is the structure of the setup used in this guide.
 
-![Unbenanntes Diagramm drawio](https://github.com/jameskimmel/Nextcloud_Ubuntu/assets/17176225/fa1cdce1-7e24-4cdf-8845-b354a0a85b71)
+![setup](https://github.com/jameskimmel/Nextcloud_Ubuntu/files/drawing.png)
 
 ## Network requirements
 If you want to access Nextcloud remotely and share files with external users, there are some network requirements.  

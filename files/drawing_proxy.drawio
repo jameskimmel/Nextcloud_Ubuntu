@@ -1,0 +1,36 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.1 Chrome/142.0.7444.265 Electron/39.8.0 Safari/537.36" version="29.6.1">
+  <diagram name="Seite-1" id="EPSfSe3vJeo6m7faBH8_">
+    <mxGraphModel dx="1022" dy="614" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4Ghlr38VQDsrVE0UPqof-5" edge="1" parent="1" source="4Ghlr38VQDsrVE0UPqof-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="4Ghlr38VQDsrVE0UPqof-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4Ghlr38VQDsrVE0UPqof-1" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/networking/DNS_Zones.svg;" value="cloud.yourdomain.com&lt;br&gt;A and AAAA record" vertex="1">
+          <mxGeometry height="64" width="64" x="60" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="4Ghlr38VQDsrVE0UPqof-3" parent="1" style="image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/VM_Linux.svg;" value="Nextcloud on Ubuntu&lt;div&gt;192.168.1.2&lt;/div&gt;" vertex="1">
+          <mxGeometry height="46" width="50" x="640" y="67" as="geometry" />
+        </mxCell>
+        <mxCell id="mYvsyXbx1Vxk4uFSJy1b-3" edge="1" parent="1" source="4Ghlr38VQDsrVE0UPqof-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="mYvsyXbx1Vxk4uFSJy1b-1" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="390" y="90" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4Ghlr38VQDsrVE0UPqof-4" parent="1" style="image;html=1;image=img/lib/clip_art/networking/Firewall_02_128x128.png" value="Firewall&amp;nbsp;&lt;br&gt;Port 80 and 443" vertex="1">
+          <mxGeometry height="80" width="80" x="230" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mYvsyXbx1Vxk4uFSJy1b-1" parent="1" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.servers.reverse_proxy;" value="NGINX reverse Proxy&lt;div&gt;192.168.1.10&lt;/div&gt;" vertex="1">
+          <mxGeometry height="53" width="41" x="450" y="64" as="geometry" />
+        </mxCell>
+        <mxCell id="mYvsyXbx1Vxk4uFSJy1b-4" edge="1" parent="1" source="mYvsyXbx1Vxk4uFSJy1b-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="4Ghlr38VQDsrVE0UPqof-3" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="550" y="250" as="sourcePoint" />
+            <mxPoint x="690" y="251" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

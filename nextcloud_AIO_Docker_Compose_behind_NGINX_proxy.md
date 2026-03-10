@@ -1,12 +1,12 @@
-# Example installation on Ubuntu 24.04.03 LTS with Docker compose 
+# Example installation on Ubuntu 24.04.03 LTS with Docker Compose 
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance with Docker Compose behind a external NGINX proxy.
 The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to jump from one topic to another and have to read up on multiple things. This guide hopefully offers you a more streamlined experience.  
 There are some placeholder values or variables that always start with x_. You need to replace them with your data.  
-This is the structure of the setup used in this guide.
+This is the structure of the setup used in this guide:
 
-
+![setup](https://github.com/jameskimmel/Nextcloud_Ubuntu/files/drawing_proxy.png)
 
 ## Network requirements
 If you want to access Nextcloud remotely and share files with external users, there are some network requirements.  
@@ -81,6 +81,70 @@ Since you are running NGINX on a different host, I assume that you have some bas
 
 I like to start with an almost empty cloud.x_yourdomain.com.conf file
 ```bash
-sudo nano /etc/nginx/sites-available/
+sudo nano /etc/nginx/sites-available/cloud.x_yourdomain.com.conf
 ```
-insert the text from [files/intial_NGINX.conf](https://github.com/jameskimmel/Nextcloud_Ubuntu/blob/main/files/intial_NGINX.conf)
+insert the text from [intial_NGINX.conf](https://github.com/jameskimmel/Nextcloud_Ubuntu/blob/main/files/intial_NGINX.conf)
+
+enable it and run certbot to get a valid cert
+```bash
+sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.com.conf /etc/nginx/sites-enabled/
+sudo certbot
+```
+after that, configure cloud.x_yourdomain.com
+```bash
+sudo nano /etc/nginx/sites-available/cloud.x_yourdomain.com.conf
+```
+and make it look like this:
+[NGINX.conf](https://github.com/jameskimmel/Nextcloud_Ubuntu/blob/main/files/NGINX.conf)
+
+## Docker Compose
+Create the compose file by
+```bash
+nano compose.yaml
+```
+and insert nextcloud_compose.yaml
+
+all environment changes the line APACHE_IP_BINDING: 192.168.1.2 are totally optional and you don't have to use them. If you don't like them simply comment them out by putting a hashtag # in front. 
+
+I for one want the data to be in the folder /mnt/ncdata/nextcloud which in return is a external NFS mount. 
+
+The only thing you have to make sure, is that the NEXTCLOUD_MAX_TIME is smaller than the timeout in the NGINX reverse proxy, so that always Nextcloud times out and never the reverse proxy. 
+
+## optional external NFS mount
+```bash
+sudo apt install nfs-common
+sudo nano /etc/fstab
+```
+then add something like this:
+```bash
+192.168.1.3:/mnt/pool/nextcloud /mnt/ncdata/nextcloud  nfs defaults 0 0
+```
+
+## start Docker Compose
+Start you compose file and show the logs. You can always exit the logs with ctr + c.
+
+```bash
+sudo docker compose pull && sudo docker compose up -d && sudo docker compose logs -f
+```
+
+Like shown in the logs, you should now be able to access Nextcloud by using https://192.168.1.2:8080. You will get a cert error, since this cert is self signed. Finish the installation in the webGUI and write down the passphrase. 
+
+## make some needed env changes
+Do some maintenance, set the reverse proxy and set a server id
+```bash
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ maintenance:repair --include-expensive
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set trusted_proxies 2 --value="192.168.1.10"
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set serverid --value="2"
+```
+
+## make some optional changes
+Set language and locale based on [this](https://explore.transifex.com/languages/). 
+Set phone_region based on [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1#Codes)
+Set skeleton und template so that a new user does not get preinstalled files. 
+```bash
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set default_language --value="de_CH"
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set default_locale --value="de_CH"
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set default_phone_region --value="CH"
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set skeletondirectory --value=""
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set templatedirectory --value=""
+```
