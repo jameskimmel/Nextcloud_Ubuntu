@@ -1,7 +1,7 @@
 # Example installation on Ubuntu 24.04.03 LTS with Docker Compose 
 
 ## Who is this for?
-This is an example installation for Ubuntu users who want to host a Nextcloud instance with Docker Compose behind a external NGINX proxy.
+This is an example installation for Ubuntu users who want to host a Nextcloud instance with Docker Compose behind a NGINX proxy (on another host).
 The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to jump from one topic to another and have to read up on multiple things. This guide hopefully offers you a more streamlined experience.  
 There are some placeholder values or variables that always start with x_. You need to replace them with your data.  
 This is the structure of the setup used in this guide:
@@ -20,8 +20,7 @@ You also need split DNS described in the next paragraph.
 What is split DNS and why is it needed for IPv4?  
 Let's assume your WAN IPv4 is 85.29.10.1 and your NGINX Proxy has the IP 192.168.1.10 and your domain is cloud.yourdomain.com.  
 If you are on the road and try to connect to your Nextcloud, your client will ask "Hey, what IP is cloud.yourdomain.com?" a DNS server will answer with "85.29.10.1".
-Then traffic will go to your firewall and some kind of **NAT** will redirect it to your Nextcloud instance on 192.168.1.10. 
-But if you are on your local network, that probably will not work, because your firewall only NATs from WAN to LAN and not LAN to LAN. 
+Then traffic will go to your firewall and some kind of **NAT** will redirect it to your NGINX reverse proxy on 192.168.1.10 (which in return proxy passes you to the Nextcloud instance). But if you are on your local network, that probably will not work, because your firewall only NATs from WAN to LAN and not LAN to LAN. 
 The easiest way to solve this is to use split DNS. Tell your DNS server, that instead of answering cloud.yourdomain.com with 85.29.10.1 it should answer it with 192.168.1.10. This is done by unbound overrides. Most home routers don't offer unbound. You may need to look into setting up a pi-hole DNS server that offers these overrides.  
 Another option that should work (but I have not looked into it!) is Hairpin NAT. 
 
