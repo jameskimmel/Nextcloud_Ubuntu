@@ -146,4 +146,5 @@ sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:syst
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set default_phone_region --value="CH"
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set skeletondirectory --value=""
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set templatedirectory --value=""
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:app:set dav system_addressbook_exposed --value="no"
 ```
