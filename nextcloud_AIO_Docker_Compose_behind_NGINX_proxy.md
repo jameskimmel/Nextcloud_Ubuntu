@@ -86,8 +86,7 @@ insert the text from [intial_NGINX.conf](https://github.com/jameskimmel/Nextclou
 
 enable it and run certbot to get a valid cert
 ```bash
-sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.com.conf /etc/nginx/sites-enabled/
-sudo certbot
+sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.com.conf /etc/nginx/sites-enabled/ && sudo nginx -t && sudo certbot
 ```
 after that, configure cloud.x_yourdomain.com
 ```bash
