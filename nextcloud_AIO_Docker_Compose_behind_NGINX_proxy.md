@@ -46,9 +46,13 @@ That way you gain security by forcing all your domains and subdomains to use HTT
 To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
 
 ## Getting ready
-Good start is to run this
+Install the latest updates
 ```bash
-sudo apt update && sudo apt upgrade
+sudo apt update && sudo apt upgrade -y
+```
+I like to enable unattended-upgrades
+```bash
+sudo dpkg-reconfigure unattended-upgrades
 ```
 
 Add Docker's official GPG key:
@@ -95,20 +99,8 @@ sudo nano /etc/nginx/sites-available/cloud.x_yourdomain.com.conf
 and make it look like this:
 [NGINX.conf](https://github.com/jameskimmel/Nextcloud_Ubuntu/blob/main/files/NGINX.conf)
 
-## Docker Compose
-Create the compose file by
-```bash
-nano compose.yaml
-```
-and insert nextcloud_compose.yaml
-
-all environment changes the line APACHE_IP_BINDING: 192.168.1.2 are totally optional and you don't have to use them. If you don't like them simply comment them out by putting a hashtag # in front. 
-
-I for one want the data to be in the folder /mnt/ncdata/nextcloud which in return is a external NFS mount. 
-
-The only thing you have to make sure, is that the NEXTCLOUD_MAX_TIME is smaller than the timeout in the NGINX reverse proxy, so that always Nextcloud times out and never the reverse proxy. 
-
-## optional external NFS mount
+## optional: external NFS mount for data
+You can skip this part, if you don't want offload the data to a NFS mount.
 ```bash
 sudo apt install nfs-common
 sudo nano /etc/fstab
@@ -117,6 +109,19 @@ then add something like this:
 ```bash
 192.168.1.3:/mnt/pool/nextcloud /mnt/ncdata/nextcloud  nfs defaults 0 0
 ```
+
+## Docker Compose
+Create the compose file. [This is the official compose file](https://github.com/nextcloud/all-in-one/blob/main/compose.yaml). I made some changes to it, feel free to adjust it to your liking. 
+```bash
+nano compose.yaml
+```
+and insert and insert [nextcloud_proxy_compose.yaml](files/nextcloud_proxy_compose.yaml)
+
+All environment changes (besides the apache ones) are  optional and you don't have to use them. If you don't like them simply comment them out by putting a hashtag # in front. 
+
+I for one want the data to be in the folder /mnt/ncdata/nextcloud which in return is a external NFS mount. 
+
+The only thing you have to make sure, is that the NEXTCLOUD_MAX_TIME is smaller than the timeout in the NGINX reverse proxy, so that always Nextcloud times out and never the reverse proxy. 
 
 ## start Docker Compose
 Start you compose file and show the logs. You can always exit the logs with ctr + c.

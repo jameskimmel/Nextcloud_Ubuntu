@@ -47,9 +47,12 @@ That way you gain security by forcing all your domains and subdomains to use HTT
 To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
 
 ## Getting ready
+Install the latest updates
 ```bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install unattended-upgrades
+```
+I like to enable unattended-upgrades
+```bash
 sudo dpkg-reconfigure unattended-upgrades
 ```
 
