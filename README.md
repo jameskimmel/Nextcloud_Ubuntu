@@ -1,5 +1,5 @@
 # Nextcloud_Ubuntu
-This is a collection tutorial on how to install Nextcloud on Ubuntu.  
+This is a collection of tutorials, on how to install Nextcloud on Ubuntu.  
 
 The goal of each of these guides, is to have no warnings in the admin center and the instance should get a perfect security score from the nextcloud [security scanner](https://scan.nextcloud.com).  
 
