@@ -686,47 +686,6 @@ To start APCu automatically use this command:
 sudo -u www-data php --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
 ```
 
-## Configure Apache2 HSTS
-This is section longer needed. 
-Was only cosmetics, because it is already done by the proxy. 
-Setting this removed the warning in the admin center in the past.
-Does not seem to be used anymore.
-```bash
-sudo nano /etc/apache2/sites-available/nextcloud.conf
-```
-insert the mod_headers.c block
-
-```bash
-<VirtualHost *:80>
-  DocumentRoot /var/www/nextcloud/
-  ServerName  cloud.x_youromain.com
-
-  <Directory /var/www/nextcloud/>
-    Satisfy Any
-    Require all granted
-    AllowOverride All
-    Options FollowSymLinks MultiViews
-
-    <IfModule mod_dav.c>
-      Dav off
-    </IfModule>
-
-    <IfModule mod_headers.c>
-      Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
-    </IfModule>
-
-  </Directory>
-</VirtualHost>
-```
-save and exit. Reload
-```bash
-sudo systemctl reload apache2
-```
-If you decided against HSTS, ditch the "preload" in the IfModule on use it like this instead
-```bash
-      Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
-```
-
 ### Pretty URLs
 Pretty URLs remove the index.php-part in all Nextcloud URLs, for example in sharing links like https://cloud.yourdomain.com/index.php/s/Sv1b7krAUqmF8QQ, making URLs shorter and thus prettier.
 

@@ -11,9 +11,9 @@ services:
     network_mode: bridge # This adds the container to the same network as docker run would do. Comment this line and uncomment the line below and the networks section at the end of the file if you want to define a custom MTU size for the docker network
     # networks: ["nextcloud-aio"]
     ports:
-      - "80:80" # Can be removed when running behind a web server or reverse proxy (like Apache, Nginx, Caddy, Cloudflare Tunnel and else). See https://github.com/nextcloud/all-in-one/blob/main/reverse-proxy.md
+    # - "80:80" # Can be removed when running behind a web server or reverse proxy (like Apache, Nginx, Caddy, Cloudflare Tunnel and else). See https://github.com/nextcloud/all-in-one/blob/main/reverse-proxy.md
       - "8080:8080" # This is the AIO interface, served via https and self-signed certificate. See https://github.com/nextcloud/all-in-one#explanation-of-used-ports
-      - "8443:8443" # Can be removed when running behind a web server or reverse proxy (like Apache, Nginx, Caddy, Cloudflare Tunnel and else). See https://github.com/nextcloud/all-in-one/blob/main/reverse-proxy.md
+    #  - "8443:8443" # Can be removed when running behind a web server or reverse proxy (like Apache, Nginx, Caddy, Cloudflare Tunnel and else). See https://github.com/nextcloud/all-in-one/blob/main/reverse-proxy.md
     environment: # Is needed when using any of the options below
     # security_opt: ["label:disable"] # Is needed when using SELinux. See https://github.com/nextcloud/all-in-one#are-there-known-problems-when-selinux-is-enabled
       # AIO_DISABLE_BACKUP_SECTION: false # Setting this to true allows to hide the backup section in the AIO interface. See https://github.com/nextcloud/all-in-one#how-to-disable-the-backup-section
@@ -24,7 +24,7 @@ services:
       # COLLABORA_SECCOMP_DISABLED: false # Setting this to true allows to disable Collabora's Seccomp feature. See https://github.com/nextcloud/all-in-one#how-to-disable-collaboras-seccomp-feature
       # DOCKER_API_VERSION: 1.44 # You can adjust the internally used docker api version with this variable. ⚠️⚠️⚠️ Warning: please note that only the default api version (unset this variable) is supported and tested by the maintainers of Nextcloud AIO. So use this on your own risk and things might break without warning. See https://github.com/nextcloud/all-in-one#how-to-adjust-the-internally-used-docker-api-version
       # FULLTEXTSEARCH_JAVA_OPTIONS: "-Xms1024M -Xmx1024M" # Allows to adjust the fulltextsearch java options. See https://github.com/nextcloud/all-in-one#how-to-adjust-the-fulltextsearch-java-options
-      NEXTCLOUD_DATADIR: /mnt/ncdata/nextcloud # Allows to set the host directory for Nextcloud's datadir. ⚠️⚠️⚠️ Warning: do not set or adjust this value after the initial Nextcloud installation is done! See https://github.com/nextcloud/all-in-one#how-to-change-the-default-location-of-nextclouds-datadir
+      # NEXTCLOUD_DATADIR: /mnt/ncdata/nextcloud # Allows to set the host directory for Nextcloud's datadir. ⚠️⚠️⚠️ Warning: do not set or adjust this value after the initial Nextcloud installation is done! See https://github.com/nextcloud/all-in-one#how-to-change-the-default-location-of-nextclouds-datadir
       # NEXTCLOUD_MOUNT: /mnt/ # Allows the Nextcloud container to access the chosen directory on the host. See https://github.com/nextcloud/all-in-one#how-to-allow-the-nextcloud-container-to-access-directories-on-the-host
       NEXTCLOUD_UPLOAD_LIMIT: 50G # Can be adjusted if you need more. See https://github.com/nextcloud/all-in-one#how-to-adjust-the-upload-limit-for-nextcloud
       NEXTCLOUD_MAX_TIME: 7200 # Can be adjusted if you need more. See https://github.com/nextcloud/all-in-one#how-to-adjust-the-max-execution-time-for-nextcloud

@@ -124,7 +124,7 @@ I for one want the data to be in the folder /mnt/ncdata/nextcloud which in retur
 The only thing you have to make sure, is that the NEXTCLOUD_MAX_TIME is smaller than the timeout in the NGINX reverse proxy, so that always Nextcloud times out and never the reverse proxy. 
 
 ## start Docker Compose
-Start you compose file and show the logs. You can always exit the logs with ctr + c.
+Start you compose file and show the logs. You can always exit the logs with ctr + c. The containers will still run in the background. 
 
 ```bash
 sudo docker compose pull && sudo docker compose up -d && sudo docker compose logs -f
@@ -152,3 +152,20 @@ sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:syst
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set templatedirectory --value=""
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:app:set dav system_addressbook_exposed --value="no"
 ```
+## Mail
+In the web GUI, go to user settings and insert a mail address for your admin user. 
+Naviate to Administration -> Basic settings to set up outgoing mail. In my example, I am using Office365 with an AppPassword created in the account settings of MS365.
+```config
+Servername: smtp.office365.com
+Port: 587
+Encryption: STARTTLS
+Needs authentification, sender and user is me@mydomain.com 
+AppPasswort
+```
+
+## 2FA 
+In the web GUI, enable 2FA.
+
+Congrats! You should no have no warnings in the admin center and a perfect score 
+on scan.nextcloud.com. 
+Hope this guied helped you and feel free to open issues or PRs.

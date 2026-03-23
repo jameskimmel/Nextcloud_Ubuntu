@@ -1,7 +1,5 @@
 # Example installation on Ubuntu 24.04.03 LTS with Docker Compose 
 
-Unfinished draft! Please don't use it!
-
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance with Docker Compose.
 The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to jump from one topic to another and have to read up on multiple things. This guide hopefully offers you a more streamlined experience.  
@@ -42,20 +40,7 @@ You can enable DHCP6 during the Ubuntu installation, by setting it to DHCP6 or l
 Your host will not only one but get three IPv6.  
 First one is a privacy extension enabled IPv6. Don't use that one, because it isn't static and will change. Second one is static, this is the one you want to use for nextcloud. Third one is only for local networks.  
 
-Unfortunately Docker does not support IPv6 out of the box. So you have to:
-```bash
-sudo nano /etc/docker/daemon.json
-```
-insert 
-```bash
-{
-    "default-network-opts": {"bridge":{"com.docker.network.enable_ipv6":"true"}}
-}
-```
-reload docker
-```bash
-sudo systemctl restart docker
-```
+However, since Nextcloud AIO currently still uses IPv4 internally, you still need an /etc/hosts override on the Nextcloud host itself.  
 
 ### Optional: HTTP Strict Transport Security (HSTS)
 This is optional.
@@ -112,12 +97,10 @@ and insert [nextcloud_compose.yaml](files/nextcloud_compose.yaml)
 
 All environment changes (besides the apache ones) are  optional and you don't have to use them. If you don't like them simply comment them out by putting a hashtag # in front. 
 
-I for one want the data to be in the folder /mnt/ncdata/nextcloud which in return is a external NFS mount. 
-
 The only thing you have to make sure, is that the NEXTCLOUD_MAX_TIME is smaller than the timeout in the NGINX reverse proxy, so that always Nextcloud times out and never the reverse proxy. 
 
 ## start Docker Compose
-Start you compose file and show the logs. You can always exit the logs with ctr + c.
+Start you compose file and show the logs. You can always exit the logs with ctr + c. The containers will still run in the background. 
 
 ```bash
 sudo docker compose pull && sudo docker compose up -d && sudo docker compose logs -f
@@ -128,8 +111,7 @@ Like shown in the logs, you should now be able to access Nextcloud by using http
 ## make some needed env changes
 Do some maintenance, set the reverse proxy and set a server id
 ```bash
-sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ maintenance:repair --include-expensive
-sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set serverid --value="2"
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ maintenance:repair --include-expensive && sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set serverid --value="2"
 ```
 
 ## make some optional changes
@@ -144,3 +126,21 @@ sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:syst
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set templatedirectory --value=""
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:app:set dav system_addressbook_exposed --value="no"
 ```
+
+## Mail
+In the web GUI, go to user settings and insert a mail address for your admin user. 
+Naviate to Administration -> Basic settings to set up outgoing mail. In my example, I am using Office365 with an AppPassword created in the account settings of MS365.
+```config
+Servername: smtp.office365.com
+Port: 587
+Encryption: STARTTLS
+Needs authentification, sender and user is me@mydomain.com 
+AppPasswort
+```
+
+## 2FA 
+In the web GUI, enable 2FA.
+
+Congrats! You should no have no warnings in the admin center and a perfect score 
+on scan.nextcloud.com. 
+Hope this guied helped you and feel free to open issues or PRs.
