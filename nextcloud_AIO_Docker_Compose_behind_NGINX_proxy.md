@@ -145,7 +145,7 @@ Set language and locale based on [this](https://explore.transifex.com/languages/
 Set phone_region based on [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1#Codes)
 Set skeleton und template so that a new user does not get preinstalled files. 
 ```bash
-sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set default_language --value="de_CH"
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set default_language --value="de"
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set default_locale --value="de_CH"
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set default_phone_region --value="CH"
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set skeletondirectory --value=""

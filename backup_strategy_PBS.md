@@ -9,7 +9,7 @@ and insert:
 '''bash
 0 3 * * tue..sat docker exec --user www-data nextcloud-aio-nextcloud php occ maintenance:mode --on
 '''
-* Note: this crontab only backups after a weekday, from tue to sat.
+* Note: this crontab only backups after a workday, from tue to sat.
 
 03:01 
 Proxmox starts backup in stop mode. It issues a shutdown command to the VM. Since AIO has no problem at all handling a OS shutdown, every container will be shut down correctly and smoothly.
