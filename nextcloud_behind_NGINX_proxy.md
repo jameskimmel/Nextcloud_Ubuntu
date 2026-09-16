@@ -1,4 +1,4 @@
-# Example installation on Ubuntu 24.04.03 LTS with Apache2,PHP FPM, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
+# Example installation on Ubuntu 26.04.1 LTS with Apache2,PHP FPM, APCu, redis, and MariaDB behind an NGINX proxy, no Docker, no Snap
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance bare metal, behind a NGINX proxy. No Docker, no Snap.  
@@ -39,11 +39,13 @@ You can enable DHCP6 during the Ubuntu installation, by setting it to DHCP6 or l
 Your host will not only one but get three IPv6.  
 First one is a privacy extension enabled IPv6. Don't use that one, because it isn't static and will change. Second one is static, this is the one you want to use for nextcloud. Third one is only for local networks.  
 
-### Optional: HTTP Strict Transport Security (HSTS)
-This  is optional.
+### HTTP Strict Transport Security (HSTS)
 You can preload HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
-That way you gain security by forcing all your domains and subdomains to use HTTPS. 
-To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
+That way you gain security by forcing all connections to your domain (and subdomains) to use HTTPS. 
+
+To learn more about HSTS and how how to enable it for your domain, go to https://hstspreload.org/
+
+After you sucessfully preloaded your domain, you can continue.
 
 ## Getting ready
 Install the latest updates
@@ -57,25 +59,18 @@ sudo dpkg-reconfigure unattended-upgrades
 
 ## Install packages
 Different Ubuntu releases have different official distro-provided PHP versions. As an example, Ubuntu 24.04.3 uses PHP 8.3.6. 
-Ubuntu is pretty often laggin behind what Nextcloud recommends.  
+Ubuntu is pretty often lagging behind what Nextcloud recommends.  
 For up to date recommendations, visit [Nextcloud admin manual](https://docs.nextcloud.com/server/stable/admin_manual/installation/system_requirements.html)  
 Since Nextcloud often recommends a newer version of PHP than what Ubuntu offers, we might need to add Sury's [ppa for Ubuntu](https://launchpad.net/~ondrej/+archive/ubuntu/php/) to apt's sources.  
 
-By pure luck, the currently by Nextcloud recommended Ubuntu version 24.04 matches the currently recommended PHP version 8.3.  
-So technically you currently don't need Ondrejs PHP packages. I still would recommend it though for future releases. 
+By pure luck, the currently by Nextcloud recommended Ubuntu version 26.04.01 offers the currently recommended PHP version 8.5.  
+So technically you currently don't need Ondrejs PHP packages.  
 
-To add his PHP and Apache2 package, run this:
-```bash
-sudo add-apt-repository ppa:ondrej/php
-sudo add-apt-repository ppa:ondrej/apache2
-```
-press to times Enter to add them.
-
-Ubuntu 24.04.3 comes with MariaDB 10.11.8 which is the currently the recommended version.  
+Ubuntu 26.04.1 comes with MariaDB 11.8 which is the currently recommended version.  
 If you need a newer version,
 [Here](https://mariadb.org/download/?t=repo-config) you find how to install MariaDB from MariaDB directly instead of Ubuntu.   
 
-Ubuntu 24.04.3 comes with Apache2 2.4 so wo don't need to add anything here. 
+Ubuntu 26.04.1 comes with Apache2 2.4 so wo don't need to add anything here. 
 
 We install all the software that is needed plus some optional software that is needed so we won't get warnings in the Nextcloud Admin Center.
 ```bash
@@ -90,34 +85,34 @@ sudo apt install apache2 \
 
 Install required php modules.
 ```bash
-sudo apt install php8.3-common \
-  php8.3-curl \
-  php8.3-xml \
-  php8.3-gd \
-  php8.3-imagick \
-  php8.3-mbstring \
-  php8.3-zip
+sudo apt install php8.5-common \
+  php8.5-curl \
+  php8.5-xml \
+  php8.5-gd \
+  php8.5-imagick \
+  php8.5-mbstring \
+  php8.5-zip
 ```
 
 install DB connector
 ```bash
-sudo apt install php8.3-mysql
+sudo apt install php8.5-mysql
 ```
 
 install recommended modules
 ```bash
-sudo apt install php8.3-intl
+sudo apt install php8.5-intl
 ```
 
 install performance modules
 ```bash
-sudo apt install php8.3-apcu \
-  php8.3-redis 
+sudo apt install php8.5-apcu \
+  php8.5-redis 
 ```
 install these for passwordless logins and performance:
 ```bash
-sudo apt install php8.3-bcmath \
-  php8.3-gmp 
+sudo apt install php8.5-bcmath \
+  php8.5-gmp 
 ```
 
 optionally you could install ffmpeg (videos) and LibreOffice (Word, Excel, PowerPoint) for preview generation. Beware, these are pretty big.
@@ -127,15 +122,18 @@ sudo apt install ffmpeg \
 ```
 
 ## MariaDB
-Change the MariaDB settings to the recommended READ-COMITTED and binlog format ROW.
+We change the MariaDB settings to the recommended settings:
 ```bash
-sudo nano /etc/mysql/conf.d/nextcloud.cnf
+sudo nano /etc/mysql/mariadb.conf.d/nextcloud.cnf
 ```
 insert
 ```bash
 [mysqld]
 transaction_isolation = READ-COMMITTED
 binlog_format = ROW
+slow_query_log = ON
+long_query_time = 2
+innodb_log_file_size = 256M
 ```
 exit and save (Ctrl + X and Y).
 
@@ -156,17 +154,6 @@ sudo mariadb
 ```
 You should now see "MariaDB [(none)]>"
 
-Check if the tx_isolation is "READ-COMITTED" and if binlog_format is "ROW".
-```mysql
-SELECT @@global.tx_isolation;
-```
-you should see a table with the text "READ-COMMITTED".  
-```mysql
-SELECT @@global.binlog_format;
-```
-now you should see the "ROW".  
-
-If everything looks good, we can continue. 
 Insert this to create a database called nextcloud. Replace 'password' with your own password.
 ```mysql
 CREATE USER 'nextcloud_db_user'@'localhost' IDENTIFIED BY 'password';
@@ -200,12 +187,12 @@ rm  latest.tar.bz2 latest.tar.bz2.sha256
 
 ## PHP FPM
 
-We stop apache, install FPM and enable the modules. Replace 8.3 with newer version if needed.
+We stop apache, install FPM and enable the modules. Replace 8.5 with newer version if needed.
 ```bash
 sudo systemctl stop apache2
-sudo apt install php8.3-fpm
+sudo apt install php8.5-fpm
 sudo a2enmod proxy_fcgi setenvif
-sudo a2enconf php8.3-fpm
+sudo a2enconf php8.5-fpm
 ```
 
 We set the hostname of our server so we don't get any warning from the apache config test. This should be a FQDN.
@@ -230,7 +217,7 @@ In the next steps, we enable MPM event.
 sudo systemctl stop apache2
 ```
 ```bash
-sudo a2dismod php8.3
+sudo a2dismod php8.5
 ```
 should not exist
 
@@ -245,7 +232,7 @@ sudo a2enmod mpm_event
 should be enabled already
 
 ```bash
-sudo a2enconf php8.3-fpm
+sudo a2enconf php8.5-fpm
 ```
 should be enabled already
 
@@ -302,9 +289,9 @@ In your browser, enter the IP of your Nextcloud host (for example http://192.168
 Add /info.php to the end (http://x_nextcloud_host_IPv4/info.php) and you can see the PHP infos. The fourth line should be "Server API" with "FPM/FastCGI".  
 
 ## PHP settings
-We wanna change the PHP memory limit and upload filesize. Replace 8.3 if you have a newer version of PHP.
+We wanna change the PHP memory limit and upload filesize. Replace 8.5 if you have a newer version of PHP.
 ```bash
-sudo nano /etc/php/8.3/fpm/php.ini
+sudo nano /etc/php/8.5/fpm/php.ini
 ```
 
 We search for these settings to change (use ctrl+W to search in nano). Watch out to delete the ; before the opcache settings, otherwise they are commented out. 
@@ -321,20 +308,20 @@ opcache.interned_strings_buffer=64
 
 Save and exit. Reload FPM
 ```bash
-sudo systemctl reload php8.3-fpm.service 
+sudo systemctl reload php8.5-fpm.service 
 ```
 after reloading the webpage, you should see the changes in info.php.
 
-PHP-FPM default values are to low. Find appropiate values with this tool https://spot13.com/pmcalculator/. 
+PHP-FPM default values are too low. Find appropiate values with this tool https://spot13.com/pmcalculator/. 
 For me this is this:
 pm.max_children = 165
 pm.start_servers = 41
 pm.min_spare_servers = 41
 pm.max_spare_servers = 123
 
-and insert them here
+and change them here
 ```bash
-sudo nano /etc/php/8.3/fpm/pool.d/www.conf
+sudo nano /etc/php/8.5/fpm/pool.d/www.conf
 ```
 
 in the same file, uncomment these environment variables:
@@ -347,7 +334,7 @@ in the same file, uncomment these environment variables:
 ```
 You should see these changes on the webpage after you restart FPM
 ```bash
-sudo systemctl reload php8.3-fpm.service 
+sudo systemctl reload php8.5-fpm.service 
 ```
 
 ## Apache2
@@ -375,6 +362,11 @@ insert and change the ServerName variable:
     <IfModule mod_dav.c>
       Dav off
     </IfModule>
+
+    <IfModule mod_headers.c>
+      Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+    </IfModule>
+
   </Directory>
 </VirtualHost>
 ```
@@ -412,7 +404,7 @@ server {
 }
 ```
 ```bash
-sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.conf /etc/nginx/sites-enabled/cloud.x_yourdomain.conf
+sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.conf /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo nginx -s reload
 ```
@@ -453,12 +445,13 @@ server {
     server_name cloud.x_youromain.com;
 
     listen 443 ssl; # managed by Certbot
-    listen [::]:443 ssl ipv6only=on; # managed by Certbot
-    http2 on;
+    listen [::]:443 ssl; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/cloud.x_youromain.com/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/cloud.x_youromain.com/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+    http2 on;
 
     # disable proxy buffers
     proxy_buffering off;
@@ -498,9 +491,6 @@ server {
         proxy_set_header X-Forwarded-Host  $host;
         proxy_set_header X-Forwarded-Port  $server_port;
         proxy_set_header Host              $host;
-
-        # This value should always be higher than the PHP timeout (1h), so that always Nextcloud times out 	and never NGINX
-        proxy_read_timeout                 3610s;
         }
 }
 
@@ -520,7 +510,6 @@ server {
 }
 
 ```
-If you decided against HTST, remove the preload. 
 Check your NGINX config and reload. 
 ```bash
 sudo nginx -t
@@ -547,8 +536,8 @@ sudo -u www-data php occ  maintenance:install \
 ```
 
 Congrats, we now have a semi working Nextcloud instance! 
-Don't worry if you see warnings in the admin center.
-We solve that in the next step. 
+Don't worry if you see warnings in the admin center.  
+We solve these in the next steps.  
 
 ## PHP config settings
 Depending if you used the CLI or webpage, some values maybe already set correct automatically.
@@ -558,20 +547,14 @@ Edit config.php file.
 ```bash
 sudo nano /var/www/nextcloud/config/config.php
 ```
-If not already done, set the trusted_domains array
+Set the trusted_domains array (if not done already by the webGUI):
 ```bash
-  'trusted_domains' =>
-  array (
-    0 => 'cloud.x_youromain.com',
-  ),
+  'trusted_domains' => 'cloud.x_youromain.com',
 ```
 
 Set the IP of our trusted NGINX proxy. Don't forget to change the IP.
 ```bash
-  'trusted_proxies' =>
-  array (
-    0 => 'x_NGINX_IPv4',
-  ),
+  'trusted_proxies' => 'x_NGINX_IPv4',
   ```
 
 we also change the overrides:
@@ -584,6 +567,11 @@ while we are at it, you could also add these settings to match your locales:
   'default_language' => 'de',
   'default_locale' => 'de_DE',
   'default_phone_region' => 'DE',
+```
+
+and we set our server ID to 1:
+```bash
+  'serverid' => 1,
 ```
 
 we also need some settings because of our proxy
@@ -629,7 +617,7 @@ Check if Opcache is working
 ```bash
 php -r 'phpinfo();' | grep opcache.enable
 ```
-should show "on" for the first line
+should show "On => On" for the first line
 
 ### Redis
 Add redis to the www-data group
@@ -642,8 +630,10 @@ sudo nano /etc/redis/redis.conf
 ```
 uncomment 
 unixsocket /run/redis/redis-server.sock
-also uncomment and set 
+
+uncomment and change 
 unixsocketperm to 770
+
 Exit and save.
 Restart redis
 ```bash
@@ -673,7 +663,7 @@ Add:
 ### APCu
 Change apcu.ini. Watch out for the PHP version
 ```bash
-sudo nano /etc/php/8.3/fpm/conf.d/20-apcu.ini 
+sudo nano /etc/php/8.5/fpm/conf.d/20-apcu.ini 
 ```
 Change it to: 
 ```config
@@ -703,7 +693,7 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:update:htaccess
 
 ### maintenance window
 We can define when a the maintenance window starts (UTC time). By default, the maintenance windows ends 4 hours after the start. 
-We start it at 3 in the morning.
+A value of 1 for example will only run background jobs between 01:00am UTC and 05:00am UTC:
 ```bash
 sudo -u www-data php /var/www/nextcloud/occ config:system:set maintenance_window_start --type=integer --value=1
 ```
@@ -715,7 +705,11 @@ sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
 ```
 
 ### Disable AppAPI
-Disable the AppAPI by clicking on your profile -> Apps and then disable the AppAPI app. 
+You only need this, if you want to run external apps. 
+We disable it by running:
+```bash
+sudo -u www-data php /var/www/nextcloud/occ app:disable app_api
+```
 
 ### Enable Two-Factor TOTP Provider
 While you are at it, I recommend you enable Two-Factor TOTP Provider for 2FA.

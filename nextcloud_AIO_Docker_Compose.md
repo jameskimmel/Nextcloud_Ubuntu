@@ -42,11 +42,13 @@ First one is a privacy extension enabled IPv6. Don't use that one, because it is
 
 However, since Nextcloud AIO currently still uses IPv4 internally, you still need an /etc/hosts override on the Nextcloud host itself.  
 
-### Optional: HTTP Strict Transport Security (HSTS)
-This is optional.
+### HTTP Strict Transport Security (HSTS)
 You can preload HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
-That way you gain security by forcing all your domains and subdomains to use HTTPS. 
-To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
+That way you gain security by forcing all connections to your domain (and subdomains) to use HTTPS. 
+
+To learn more about HSTS and how how to enable it for your domain, go to https://hstspreload.org/
+
+After you sucessfully preloaded your domain, you can continue.
 
 ## Getting ready
 Good start is to run this

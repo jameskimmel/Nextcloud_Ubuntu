@@ -39,11 +39,13 @@ You can enable DHCP6 during the Ubuntu installation, by setting it to DHCP6 or l
 Your host will not only one but get three IPv6.  
 First one is a privacy extension enabled IPv6. Don't use that one, because it isn't static and will change. Second one is static, this is the one you want to use for nextcloud. Third one is only for local networks.  
 
-### Optional: HTTP Strict Transport Security (HSTS)
-This is optional.
+### HTTP Strict Transport Security (HSTS)
 You can preload HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
-That way you gain security by forcing all your domains and subdomains to use HTTPS. 
-To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
+That way you gain security by forcing all connections to your domain (and subdomains) to use HTTPS. 
+
+To learn more about HSTS and how how to enable it for your domain, go to https://hstspreload.org/
+
+After you sucessfully preloaded your domain, you can continue.
 
 ## Getting ready
 Install the latest updates
