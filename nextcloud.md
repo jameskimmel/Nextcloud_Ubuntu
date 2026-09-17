@@ -135,6 +135,9 @@ binlog_format = ROW
 slow_query_log = ON
 long_query_time = 2
 innodb_log_file_size = 256M
+thread_cache_size = 37
+tmp_table_size = 64M
+max_heap_table_size = 64M
 ```
 exit and save (Ctrl + X and Y).
 
@@ -220,17 +223,17 @@ sudo systemctl stop apache2
 ```bash
 sudo a2dismod php8.5
 ```
-should not exist
+should show disabled
 
 ```bash
 sudo a2dismod mpm_prefork
 ```
-should already be disabled
+should show disabled
 
 ```bash
 sudo a2enmod mpm_event
 ```
-should be enabled already
+should enable it
 
 ```bash
 sudo a2enconf php8.5-fpm
@@ -327,23 +330,24 @@ sudo nano /etc/php/8.5/fpm/pool.d/www.conf
 
 in the same file, uncomment these environment variables:
 ```bash
-;env[HOSTNAME] = $HOSTNAME
-;env[PATH] = /usr/local/bin:/usr/bin:/bin
-;env[TMP] = /tmp
-;env[TMPDIR] = /tmp
-;env[TEMP] = /tmp
+env[HOSTNAME] = $HOSTNAME
+env[PATH] = /usr/local/bin:/usr/bin:/bin
+env[TMP] = /tmp
+env[TMPDIR] = /tmp
+env[TEMP] = /tmp
 ```
 You should see these changes on the webpage after you restart FPM
 ```bash
 sudo systemctl reload php8.5-fpm.service 
 ```
 
-## Apache2
-Create the nextcloud folder
+## Data folder
+Create the nextcloud data folder, where we will store all user data
 ```bash
 sudo -u www-data mkdir /var/www/nextcloud/data
 ```
 
+## Apache2
 Configure Apache2
 ```bash
 sudo nano /etc/apache2/sites-available/nextcloud.conf
@@ -376,7 +380,7 @@ sudo a2enmod rewrite headers env dir mime setenvif
 We disable the default page and delete the default folder.
 ```bash
 sudo a2dissite 000-default.conf
-sudo systemctl reload apache2
+sudo systemctl restart apache2
 sudo rm -r /var/www/html
 ```
 
