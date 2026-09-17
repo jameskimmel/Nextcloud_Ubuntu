@@ -166,7 +166,7 @@ GRANT ALL PRIVILEGES ON nextcloud.* TO 'nextcloud_db_user'@'localhost';
 FLUSH PRIVILEGES;
 exit;
 ```
-You should see 4 times a "Query OK" line and a "Bye" at the end.
+Press Enter. You should see 4 times a "Query OK" line and a "Bye" at the end.
 
 ## Nextcloud
 Download Nextcloud
@@ -303,7 +303,7 @@ We search for these settings to change (use ctrl+W to search in nano). Watch out
 memory_limit = 1G
 upload_max_filesize = 50G
 max_file_uploads = 200
-post_max_size = 0
+post_max_size = 50G
 max_execution_time = 3600
 date.timezone = Europe/Zurich
 opcache.memory_consumption=256
@@ -367,6 +367,7 @@ insert and change the ServerName variable:
     <IfModule mod_dav.c>
       Dav off
     </IfModule>
+
   </Directory>
 </VirtualHost>
 ```
@@ -452,7 +453,7 @@ Set the trusted_domains array (if not done already by the webGUI):
   'trusted_domains' => 'cloud.x_youromain.com',
 ```
 
-we also change the overrides:
+Set the overwrite.cli.url (if not done already by the webGUI):
 ```bash
   'overwrite.cli.url' => 'https://cloud.x_youromain.com',
 ```
@@ -503,6 +504,14 @@ AppPasswort
 ```
 
 ## Caching
+We do different caching stuff in the next captures. 
+
+### Opcache
+Check if Opcache is working
+```bash
+php -r 'phpinfo();' | grep opcache.enable
+```
+should show "On => On" for the first line
 
 ### Redis
 Add redis to the www-data group
@@ -561,18 +570,14 @@ To start APCu automatically use this command:
 sudo -u www-data php --define apc.enable_cli=1  /var/www/nextcloud/occ  maintenance:repair
 ```
 
-Check if Opcache is working
-```bash
-php -r 'phpinfo();' | grep opcache.enable
-```
 
 ## Configure Apache2 HSTS
-We set the strict transport security. 
+We set the strict transport security. For that we change the by Let's encrypt created config file.  
 
 ```bash
 sudo nano /etc/apache2/sites-available/nextcloud-le-ssl.conf
 ```
-Insert the IfModule mod_headers.
+Insert the IfModule mod_headers at the end.  
 Your setting should look like this:
 
 ```bash

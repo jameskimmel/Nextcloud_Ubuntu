@@ -165,7 +165,7 @@ GRANT ALL PRIVILEGES ON nextcloud.* TO 'nextcloud_db_user'@'localhost';
 FLUSH PRIVILEGES;
 exit;
 ```
-You should see 4 times a "Query OK" line and a "Bye" at the end.
+Press Enter. You should see 4 times a "Query OK" line and a "Bye" at the end.
 
 ## Nextcloud
 Download Nextcloud
@@ -302,7 +302,7 @@ We search for these settings to change (use ctrl+W to search in nano). Watch out
 memory_limit = 1G
 upload_max_filesize = 50G
 max_file_uploads = 200
-post_max_size = 0
+post_max_size = 50G
 max_execution_time = 3600
 date.timezone = Europe/Zurich
 opcache.memory_consumption=256
@@ -558,8 +558,10 @@ Encryption: STARTTLS
 Needs authentification, sender and user is me@mydomain.com 
 AppPasswort
 ```
-
 ## Caching
+We do different caching stuff in the next captures. 
+
+### Opcache
 Check if Opcache is working
 ```bash
 php -r 'phpinfo();' | grep opcache.enable
