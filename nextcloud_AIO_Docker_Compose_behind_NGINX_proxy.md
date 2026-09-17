@@ -82,7 +82,7 @@ sudo apt update && sudo apt install docker-ce docker-ce-cli containerd.io docker
 ```
 
 ## NGINX
-Since you are running NGINX on a different host, I assume that you have some basic knowlege about how to run I like to start with some empty NGINX settings. This guid assumes that your conf files are under /etc/nginx/sites-available/ and get activated by doing a symlink to /etc/nginx/sites-enabled/
+Since you are running NGINX on a different host, I assume that you have some basic knowlege about how to run NGXIN. This guide assumes that your conf files are under /etc/nginx/sites-available/ and get activated by doing a symlink to /etc/nginx/sites-enabled/
 
 I like to start with an almost empty cloud.x_yourdomain.com.conf file
 ```bash
@@ -94,12 +94,14 @@ enable it and run certbot to get a valid cert
 ```bash
 sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.com.conf /etc/nginx/sites-enabled/ && sudo nginx -t && sudo certbot
 ```
-after that, configure cloud.x_yourdomain.com
+after that, configure cloud.x_yourdomain.com.conf
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_yourdomain.com.conf
 ```
 and make it look like this:
 [NGINX.conf](https://github.com/jameskimmel/Nextcloud_Ubuntu/blob/main/files/NGINX.conf)
+
+there is an official NGINX guide [here](https://github.com/nextcloud/all-in-one/blob/main/reverse-proxy.md#nginx-freenginx-openresty-angie), but it is IMHO currently (17.09.2026) outdated.
 
 ## optional: external NFS mount for data
 You can skip this part, if you don't want offload the data to a NFS mount.

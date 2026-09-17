@@ -393,7 +393,7 @@ should show 'Syntax ok'
 ## NGINX settings on the reverse Proxy
 First we create an emtpy site without ssl.
 ```bash
-sudo nano /etc/nginx/sites-available/cloud.x_yourdomain.conf
+sudo nano /etc/nginx/sites-available/cloud.x_yourdomain.com.conf
 ```
 
 ```NGINX
@@ -404,7 +404,7 @@ server {
 }
 ```
 ```bash
-sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.com.conf /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo nginx -s reload
 ```
@@ -436,80 +436,17 @@ To test if the automatic removal is working run
 sudo certbot renew --dry-run
 ```
 
+Now that you have a working cert, change your NGINX conig by
+
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_youromain.conf
 ```
-Change change the proxy pass IP line and all the cloud.x_youromain.com variables. In the end, it should look like this:
-```NGINX
-server {
-    server_name cloud.x_youromain.com;
 
-    listen 443 ssl; # managed by Certbot
-    listen [::]:443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/cloud.x_youromain.com/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/cloud.x_youromain.com/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+make it look like this:
+[NGINX.conf](https://github.com/jameskimmel/Nextcloud_Ubuntu/blob/main/files/NGINX.conf)
 
-    http2 on;
+Don't forget to change the IPv4 192.168.1.2 and all the cloud.x_youromain.com variables.
 
-    # disable proxy buffers
-    proxy_buffering off;
-    proxy_request_buffering off;
-
-    client_max_body_size 0;
-    client_body_buffer_size 512k;
-
-    # This value should be higher than the PHP timeout (1h), so that Nextcloud always times out and not NGINX
-    proxy_read_timeout 3610s;
-
-    # add headers. Comment second line, if you don't use HSTS
-    add_header Referrer-Policy           "no-referrer" always;
-    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
-
-    # logging
-    access_log              /var/log/nginx/access.log combined buffer=512k flush=1m;
-    error_log               /var/log/nginx/error.log warn;
-    
-    # reverse proxy
-    location / {
-        proxy_pass            http://x_nextcloud_host_IPv4:80$request_uri;
-
-        proxy_http_version                 1.1;
-        proxy_cache_bypass                 $http_upgrade;
-
-        # Proxy SSL
-        proxy_ssl_server_name              on;
-
-        # Proxy headers
-        proxy_set_header Upgrade           $http_upgrade;
-        proxy_set_header Connection        $connection_upgrade;
-        proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-        # is the next line still needed?
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host  $host;
-        proxy_set_header X-Forwarded-Port  $server_port;
-        proxy_set_header Host              $host;
-        }
-}
-
-
-server {
-    if ($host = cloud.x_youromain.com) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
-
-
-    listen      80;
-    listen      [::]:80;
-    server_name cloud.x_youromain.com;
-    return 404; # managed by Certbot
-
-
-}
-
-```
 Check your NGINX config and reload. 
 ```bash
 sudo nginx -t
