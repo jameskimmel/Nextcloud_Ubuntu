@@ -1,4 +1,4 @@
-# Example installation on Ubuntu 24.04.03 LTS with Docker Compose 
+# Example installation on Ubuntu 26.04.01 LTS with Docker Compose 
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance with Docker Compose behind a NGINX proxy (on another host).
@@ -33,6 +33,9 @@ and insert the IPv4 override
 192.168.1.10 cloud.x_yourdomain.com
 ```
 
+### VLAN
+If you are using VLANs, there may be some additional considerations to keep in mind. A global unbound override might not be what you want, since it may not be reachable from both, Nextcloud itself and your clients. You can either create firewall rules to ensure it is reachable from both, or use a different DNS entry for Nextcloud itself by adding an /etc/hosts override on the Nextcloud host.
+
 ### IPv6
 IPv6 works out of the box, because there is no pesky **NAT** involved. IPv6 does not need NAT, because every device gets its own public IP.  
 You can enable DHCP6 during the Ubuntu installation, by setting it to DHCP6 or later on by adding dhcp6: true to netplan.  
@@ -59,7 +62,6 @@ sudo dpkg-reconfigure unattended-upgrades
 
 Add Docker's official GPG key:
 ```bash
-sudo apt update
 sudo apt install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -82,7 +84,7 @@ sudo apt update && sudo apt install docker-ce docker-ce-cli containerd.io docker
 ```
 
 ## NGINX
-Since you are running NGINX on a different host, I assume that you have some basic knowlege about how to run NGXIN. This guide assumes that your conf files are under /etc/nginx/sites-available/ and get activated by doing a symlink to /etc/nginx/sites-enabled/
+Since you are running NGINX on a different host, I assume that you have some basic knowlege about how to run NGINX. This guide assumes that your conf files are under /etc/nginx/sites-available/ and get activated by doing a symlink to /etc/nginx/sites-enabled/
 
 I like to start with an almost empty cloud.x_yourdomain.com.conf file
 ```bash
@@ -90,7 +92,7 @@ sudo nano /etc/nginx/sites-available/cloud.x_yourdomain.com.conf
 ```
 insert the text from [intial_NGINX.conf](https://github.com/jameskimmel/Nextcloud_Ubuntu/blob/main/files/intial_NGINX.conf)
 
-enable it and run certbot to get a valid cert
+enable it, check inf the config is fine, run certbot to get a valid cert
 ```bash
 sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.com.conf /etc/nginx/sites-enabled/ && sudo nginx -t && sudo certbot
 ```
@@ -134,7 +136,7 @@ Start you compose file and show the logs. You can always exit the logs with ctr 
 sudo docker compose pull && sudo docker compose up -d && sudo docker compose logs -f
 ```
 
-Like shown in the logs, you should now be able to access Nextcloud by using https://192.168.1.2:8080. You will get a cert error, since this cert is self signed. Finish the installation in the webGUI and write down the passphrase. 
+Like shown in the logs, you should now be able to access Nextcloud by using https://192.168.1.2:8080. You will get a cert error, since this cert is self signed. Write down the passphrase and finish the installation in the webGUI.  
 
 ## make some needed env changes
 Do some maintenance, set the reverse proxy and set a server id
