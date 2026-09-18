@@ -33,6 +33,8 @@ and insert the IPv4 override
 ```bash
 192.168.1.10 cloud.x_yourdomain.com
 ```
+### VLAN
+If you are using VLANs, there may be some additional considerations to keep in mind. A global unbound override might not be what you want, since it may not be reachable from both, Nextcloud itself and your clients. You can either create firewall rules to ensure it is reachable from both, or use a different DNS entry for Nextcloud itself by adding an /etc/hosts override on the Nextcloud host.
 
 ### IPv6
 IPv6 works out of the box, because there is no pesky **NAT** involved. IPv6 does not need NAT, because every device gets its own public IP.  
