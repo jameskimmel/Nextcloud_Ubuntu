@@ -111,7 +111,7 @@ Start you compose file and show the logs. You can always exit the logs with ctr 
 sudo docker compose pull && sudo docker compose up -d && sudo docker compose logs -f
 ```
 
-Like shown in the logs, you should now be able to access Nextcloud by using https://192.168.1.2:8080. You will get a cert error, since this cert is self signed. Write down the passphrase and finish the installation in the webGUI.  
+Like shown in the logs, you should now be able to access Nextcloud by using https://192.168.1.2:8080. You will get a cert error, since this cert is self signed. Write down the passphrase and finish the installation in the webGUI. After clicking on "Downloading and pulling containers" you should see the containers starting up. When everything is up and running, you will see a random password for the admin user. Click on "Open your Nextcloud". That should redirect you to your working cloud.yourdomain.com page where you can login as admin.  
 
 ## make some needed env changes
 Do some maintenance, set the reverse proxy and set a server id
