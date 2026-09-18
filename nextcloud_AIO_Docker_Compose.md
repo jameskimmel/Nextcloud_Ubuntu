@@ -1,5 +1,8 @@
 # Example installation on Ubuntu 26.04.01 LTS with Docker Compose 
 
+This guide is currently untested. If you can test it or provide feedback, please open an issue. 
+I might find the time in the near future to test it. Until than, please don't use it in production. 
+
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance with Docker Compose.
 The goal of this guide is to have **no warnings in the admin center** and the instance should get a **perfect security score** from scan.nextcloud.com. The official documentation is pretty good, but it can be a little bit overwhelming to newcomers because you need to jump from one topic to another and have to read up on multiple things. This guide hopefully offers you a more streamlined experience.  
