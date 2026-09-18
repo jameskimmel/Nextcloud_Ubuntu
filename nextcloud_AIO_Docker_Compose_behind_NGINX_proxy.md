@@ -142,7 +142,7 @@ Like shown in the logs, you should now be able to access Nextcloud by using http
 Do some maintenance, set the reverse proxy and set a server id
 ```bash
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ maintenance:repair --include-expensive
-sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set trusted_proxies 2 --value="192.168.1.10"
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set trusted_proxies 3 --value="192.168.1.10"
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set serverid --value="2"
 ```
 
