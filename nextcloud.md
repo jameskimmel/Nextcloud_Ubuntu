@@ -458,18 +458,24 @@ Set the overwrite.cli.url (if not done already by the webGUI):
   'overwrite.cli.url' => 'https://cloud.x_youromain.com',
 ```
 
-while we are at it, you could also add these settings to match your locales:
+and we set our server ID to 2:
 ```bash
-  'default_language' => 'de',
-  'default_locale' => 'de_DE',
-  'default_phone_region' => 'DE',
+  'serverid' => 2,
 ```
 
-and we set our server ID to 1:
+You can also add some optional changes here.
+Language and locale based on [this](https://explore.transifex.com/languages/). 
+Phone_region based on [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1#Codes)
+Set skeleton und template so that a new user does not get preinstalled files. 
+
 ```bash
-  'serverid' => 1,
+  'default_language' => 'de',
+  'default_locale' => 'de_CH',
+  'default_phone_region' => 'CH',
+  'skeletondirectory' => '',
+  'templatedirectory' => '',
+  'system_addressbook_exposed' => 'no',
 ```
-save and exit
 
 update the settings by
 ```bash
