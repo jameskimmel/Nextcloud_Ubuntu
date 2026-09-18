@@ -1,4 +1,4 @@
-# Example installation on Ubuntu 24.04.03 LTS with Docker Compose 
+# Example installation on Ubuntu 26.04.01 LTS with Docker Compose 
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance with Docker Compose behind a NGINX proxy (on another host).
@@ -33,17 +33,22 @@ and insert the IPv4 override
 192.168.1.10 cloud.x_yourdomain.com
 ```
 
+### VLAN
+If you are using VLANs, there may be some additional considerations to keep in mind. A global unbound override might not be what you want, since it may not be reachable from both, Nextcloud itself and your clients. You can either create firewall rules to ensure it is reachable from both, or use a different DNS entry for Nextcloud itself by adding an /etc/hosts override on the Nextcloud host.
+
 ### IPv6
 IPv6 works out of the box, because there is no pesky **NAT** involved. IPv6 does not need NAT, because every device gets its own public IP.  
 You can enable DHCP6 during the Ubuntu installation, by setting it to DHCP6 or later on by adding dhcp6: true to netplan.  
 Your host will not only one but get three IPv6.  
 First one is a privacy extension enabled IPv6. Don't use that one, because it isn't static and will change. Second one is static, this is the one you want to use for nextcloud. Third one is only for local networks.  
 
-### Optional: HTTP Strict Transport Security (HSTS)
-This is optional.
+### HTTP Strict Transport Security (HSTS)
 You can preload HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
-That way you gain security by forcing all your domains and subdomains to use HTTPS. 
-To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
+That way you gain security by forcing all connections to your domain (and subdomains) to use HTTPS. 
+
+To learn more about HSTS and how how to enable it for your domain, go to https://hstspreload.org/
+
+After you sucessfully preloaded your domain, you can continue.
 
 ## Getting ready
 Install the latest updates
@@ -57,7 +62,6 @@ sudo dpkg-reconfigure unattended-upgrades
 
 Add Docker's official GPG key:
 ```bash
-sudo apt update
 sudo apt install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -80,7 +84,7 @@ sudo apt update && sudo apt install docker-ce docker-ce-cli containerd.io docker
 ```
 
 ## NGINX
-Since you are running NGINX on a different host, I assume that you have some basic knowlege about how to run I like to start with some empty NGINX settings. This guid assumes that your conf files are under /etc/nginx/sites-available/ and get activated by doing a symlink to /etc/nginx/sites-enabled/
+Since you are running NGINX on a different host, I assume that you have some basic knowlege about how to run NGINX. This guide assumes that your conf files are under /etc/nginx/sites-available/ and get activated by doing a symlink to /etc/nginx/sites-enabled/
 
 I like to start with an almost empty cloud.x_yourdomain.com.conf file
 ```bash
@@ -88,16 +92,18 @@ sudo nano /etc/nginx/sites-available/cloud.x_yourdomain.com.conf
 ```
 insert the text from [intial_NGINX.conf](https://github.com/jameskimmel/Nextcloud_Ubuntu/blob/main/files/intial_NGINX.conf)
 
-enable it and run certbot to get a valid cert
+enable it, check inf the config is fine, run certbot to get a valid cert
 ```bash
 sudo ln -s /etc/nginx/sites-available/cloud.x_yourdomain.com.conf /etc/nginx/sites-enabled/ && sudo nginx -t && sudo certbot
 ```
-after that, configure cloud.x_yourdomain.com
+after that, configure cloud.x_yourdomain.com.conf
 ```bash
 sudo nano /etc/nginx/sites-available/cloud.x_yourdomain.com.conf
 ```
 and make it look like this:
 [NGINX.conf](https://github.com/jameskimmel/Nextcloud_Ubuntu/blob/main/files/NGINX.conf)
+
+there is an official NGINX guide [here](https://github.com/nextcloud/all-in-one/blob/main/reverse-proxy.md#nginx-freenginx-openresty-angie), but it is IMHO currently (17.09.2026) outdated.
 
 ## optional: external NFS mount for data
 You can skip this part, if you don't want offload the data to a NFS mount.
@@ -130,13 +136,13 @@ Start you compose file and show the logs. You can always exit the logs with ctr 
 sudo docker compose pull && sudo docker compose up -d && sudo docker compose logs -f
 ```
 
-Like shown in the logs, you should now be able to access Nextcloud by using https://192.168.1.2:8080. You will get a cert error, since this cert is self signed. Finish the installation in the webGUI and write down the passphrase. 
+Like shown in the logs, you should now be able to access Nextcloud by using https://192.168.1.2:8080. You will get a cert error, since this cert is self signed. Write down the passphrase and finish the installation in the webGUI. After clicking on "Downloading and pulling containers" you should see the containers starting up. When everything is up and running, you will see a random password for the admin user. Click on "Open your Nextcloud". That should redirect you to your working cloud.yourdomain.com page where you can login as admin.  
 
 ## make some needed env changes
 Do some maintenance, set the reverse proxy and set a server id
 ```bash
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ maintenance:repair --include-expensive
-sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set trusted_proxies 2 --value="192.168.1.10"
+sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set trusted_proxies 3 --value="192.168.1.10"
 sudo docker exec --user www-data -it nextcloud-aio-nextcloud php occ config:system:set serverid --value="2"
 ```
 

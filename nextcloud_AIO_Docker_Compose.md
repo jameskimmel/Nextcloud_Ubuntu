@@ -1,4 +1,7 @@
-# Example installation on Ubuntu 24.04.03 LTS with Docker Compose 
+# Example installation on Ubuntu 26.04.01 LTS with Docker Compose 
+
+This guide is currently untested. If you can test it or provide feedback, please open an issue. 
+I might find the time in the near future to test it. Until than, please don't use it in production. 
 
 ## Who is this for?
 This is an example installation for Ubuntu users who want to host a Nextcloud instance with Docker Compose.
@@ -33,6 +36,8 @@ and insert the IPv4 override
 ```bash
 192.168.1.10 cloud.x_yourdomain.com
 ```
+### VLAN
+If you are using VLANs, there may be some additional considerations to keep in mind. A global unbound override might not be what you want, since it may not be reachable from both, Nextcloud itself and your clients. You can either create firewall rules to ensure it is reachable from both, or use a different DNS entry for Nextcloud itself by adding an /etc/hosts override on the Nextcloud host.
 
 ### IPv6
 IPv6 works out of the box, because there is no pesky **NAT** involved. IPv6 does not need NAT, because every device gets its own public IP.  
@@ -42,21 +47,26 @@ First one is a privacy extension enabled IPv6. Don't use that one, because it is
 
 However, since Nextcloud AIO currently still uses IPv4 internally, you still need an /etc/hosts override on the Nextcloud host itself.  
 
-### Optional: HTTP Strict Transport Security (HSTS)
-This is optional.
+### HTTP Strict Transport Security (HSTS)
 You can preload HTTP Strict Transport Security (HSTS) for your domain and all your subdomains.
-That way you gain security by forcing all your domains and subdomains to use HTTPS. 
-To learn more about HSTS and how you can enable it for your domain, go to https://hstspreload.org/
+That way you gain security by forcing all connections to your domain (and subdomains) to use HTTPS. 
+
+To learn more about HSTS and how how to enable it for your domain, go to https://hstspreload.org/
+
+After you sucessfully preloaded your domain, you can continue.
 
 ## Getting ready
-Good start is to run this
+Install the latest updates
 ```bash
-sudo apt update && sudo apt upgrade
+sudo apt update && sudo apt upgrade -y
+```
+I like to enable unattended-upgrades
+```bash
+sudo dpkg-reconfigure unattended-upgrades
 ```
 
 Add Docker's official GPG key:
 ```bash
-sudo apt update
 sudo apt install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -97,8 +107,6 @@ and insert [nextcloud_compose.yaml](files/nextcloud_compose.yaml)
 
 All environment changes (besides the apache ones) are  optional and you don't have to use them. If you don't like them simply comment them out by putting a hashtag # in front. 
 
-The only thing you have to make sure, is that the NEXTCLOUD_MAX_TIME is smaller than the timeout in the NGINX reverse proxy, so that always Nextcloud times out and never the reverse proxy. 
-
 ## start Docker Compose
 Start you compose file and show the logs. You can always exit the logs with ctr + c. The containers will still run in the background. 
 
@@ -106,7 +114,7 @@ Start you compose file and show the logs. You can always exit the logs with ctr 
 sudo docker compose pull && sudo docker compose up -d && sudo docker compose logs -f
 ```
 
-Like shown in the logs, you should now be able to access Nextcloud by using https://192.168.1.2:8080. You will get a cert error, since this cert is self signed. Finish the installation in the webGUI and write down the passphrase. 
+Like shown in the logs, you should now be able to access Nextcloud by using https://192.168.1.2:8080. You will get a cert error, since this cert is self signed. Write down the passphrase and finish the installation in the webGUI. After clicking on "Downloading and pulling containers" you should see the containers starting up. When everything is up and running, you will see a random password for the admin user. Click on "Open your Nextcloud". That should redirect you to your working cloud.yourdomain.com page where you can login as admin.  
 
 ## make some needed env changes
 Do some maintenance, set the reverse proxy and set a server id
