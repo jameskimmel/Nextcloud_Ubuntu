@@ -318,11 +318,11 @@ sudo systemctl reload php8.5-fpm.service
 after reloading the webpage, you should see the changes in info.php.
 
 PHP-FPM default values are too low. Find appropiate values with this tool https://spot13.com/pmcalculator/. 
-For me this is this:
-pm.max_children = 165
-pm.start_servers = 41
-pm.min_spare_servers = 41
-pm.max_spare_servers = 123
+For me this is this:  
+pm.max_children = 165  
+pm.start_servers = 41   
+pm.min_spare_servers = 41  
+pm.max_spare_servers = 123  
 
 and change them here
 ```bash
